@@ -14,7 +14,11 @@ async function createMainWindow(): Promise<Window | void> {
   try {
     mWindow = new Window({
       width: 600,
-      height: 700,
+      height: 250,
+      minWidth: 300,
+      maxWidth: 700,
+      minHeight: 150,
+      maxHeight: 275,
       show: false,
       frame: false,
       webPreferences: {
@@ -33,8 +37,6 @@ async function createMainWindow(): Promise<Window | void> {
   mWindow.on('ready-to-show', () => {
     mWindow.show();
   });
-
-  mWindow.webContents.openDevTools();
 
   try {
     mWindow.loadFile(Path.join(__dirname, "../", "../", "public", "Main.html"));
