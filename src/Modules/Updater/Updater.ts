@@ -41,6 +41,6 @@ export class Updater {
         setInterval(() => {
             Log.New().Message("Updater.checkForUpdates", "Verificando atualizações periodicas");
             autoUpdater.checkForUpdates();
-        }, 5 * 60 * 100);
+        }, 5 * 60 * 1000);
     }
 }
