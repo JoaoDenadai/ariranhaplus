@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./styles/Titlebar.css">
+    <link rel="stylesheet" href="./styles/Loader.css">
+    <link rel="stylesheet" href="./styles/Footer.css">
+    <link rel="stylesheet" href="./styles/Tooltip.css">
+    <link rel="stylesheet" href="./ts/modules/Formatar/Toolbar.css">
+    <link rel="stylesheet" href="./ts/modules/Formatar/Formatar.css">
+</head>
+<body>
+    <div id="Window-titlebar">
+        <div id="Window-titlebar-title">
+            <img src="./assets/otter.png">
+            <label id="Window-titlebar-titlelabel">Ariranha Plus</label>
+        </div>
+        <div id="Window-titlebar-buttonsdiv">
+            <button id="Window-titlebar-buttons-minimize"><img src="./assets/minus.png"></button>
+            <button id="Window-titlebar-buttons-close"><img src="./assets/close.png"></button>
+        </div>
+    </div>
+
+    <div id="loader-container">
+        <div id="loader"></div>
+    </div>
+
+    <div>
+        <div>
+            <div id="toolbar-container">
+                <div id="toolbar-formatar">Formatar</div>
+                <div id="toolbar-settings"><img  data-tooltip="title:Configurações do módulo\nClique para acessar as configurações do módulo." src="./assets/setting.png"></div>
+            </div>
+    
+            <div class="DIV_MODULE_Formatar" id="CONTENT">
+                <div class="DIVISION" data-screen="Formatar" id="FORMATAR">
+                    <div class="MENU_Entity" id="MENU_Entity">
+                        <div data-type="JURIDICA">Jurídica</div>
+                        <div data-type="FISICA"="">Física</div>
+                        <div data-type="ESTRANGEIRO"="">Estrangeiro</div>
+                    </div>
+                    <div class="MENU_Documents" id="MENU_Documents">
+                        <div data-type="CNPJ">CNPJ</div>
+                        <div data-type="IE">IE</div>
+                        <div data-type="CPF">CPF</div>
+                        <div data-type="RG">RG</div>
+                        <div data-type="PP">PP</div>
+                    </div>
+                    <div class="MENU_Documents" id="INPUT_Documents">
+                        <input data-tooltip="title:Formatar\nDigite o documento a ser formatado." placeholder="Digite um documento para formatar" id="INPUT_USER-Document">
+                        <div id="loading">
+                            <img id="LOADING-IMG-Status" title="O documento consta na base de dados da receita federal." src="./assets/check.png">
+                        </div>
+                        <select id="SELECT_USER-State">
+                            <option value="AC" selected>Acre</option>
+                            <option value="AL">Alagoas</option>
+                            <option value="AP">Amapá</option>
+                            <option value="AM">Amazonas</option>
+                            <option value="BA">Bahia</option>
+                            <option value="CE">Ceará</option>
+                            <option value="DF">Distrito Federal</option>
+                            <option value="ES">Espírito Santo</option>
+                            <option value="GO">Goiás</option>
+                            <option value="MA">Maranhão</option>
+                            <option value="MT">Mato Grosso</option>
+                            <option value="MS">Mato Grosso do Sul</option>
+                            <option value="MG">Minas Gerais</option>
+                            <option value="PA">Pará</option>
+                            <option value="PB">Paraíba</option>
+                            <option value="PR">Paraná</option>
+                            <option value="PE">Pernambuco</option>
+                            <option value="PI">Piauí</option>
+                            <option value="RJ">Rio de Janeiro</option>
+                            <option value="RN">Rio Grande do Norte</option>
+                            <option value="RS">Rio Grande do Sul</option>
+                            <option value="RO">Rondônia</option>
+                            <option value="RR">Roraima</option>
+                            <option value="SC">Santa Catarina</option>
+                            <option value="SP">São Paulo</option>
+                            <option value="SE">Sergipe</option>
+                            <option value="TO">Tocantins</option>
+                        </select>
+                    </div>
+                    <div class="INPUT_Checkbox_Container">
+                        <input data-tooltip="title:Copiar ao Formatar (Shift+Alt+C)\nCopia o conteúdo automáticamente após a formatação do documento." 
+                        type="checkbox" id="INPUT_Checkbox_AutoCopy" checked>
+                        <label>Copiar ao formatar</label>
+    
+                        <input data-tooltip="title:Validar ao Formatar (Shift+Alt+V)\nVerifica se o documento consta no banco de dados da receita federal.\nEssa função está apenas disponível para documentos do tipo CNPJ." type="checkbox" id="INPUT_Checkbox_Brasilapi" checked>
+                        <label>Validar ao formatar</label>
+    
+                        <input data-tooltip="title:Buffer automático\nInicializa o buffer automático da área de transferência.\nO sistema irá detectar automaticamente o conteúdo da área de transferência formatando-o para o documento selecionado. Após a formatação, o documento é copiado automaticamente." 
+                        type="checkbox" id="INPUT_Checkbox_IP"><label>Buffer automático</label>
+                    </div>
+        
+                </div>
+                <div class="DIVISION" data-screen="Configurar" id="CONFIGURAR">
+                    <div id="MENU_Configuracoes_opcoes">
+                        <div id="toolbar-gerais">Gerais</div>
+                        <div id="toolbar-buffer">Buffer</div>
+                    </div>
+                    <div class="MENU_Configuracoes_buffer" data-type="BUFFER">
+                        <label>Intervalo do buffer </label><input type="number" min="100" max="900" step="50" value="200">
+                        <label>Limite do buffer </label><input type="number" min="20" max="100" step="10" value="20">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+
+    </footer>
+  
+    
+
+    <script src="./ts/Functions.js"></script>
+    <script src="./ts/modules/Window/Titlebar.js"></script>
+    <script src="./ts/modules/Formatar/Menu.js"></script>
+    <script src="./ts/modules/Formatar/Config.js"></script>
+    <script src="./ts/modules/Window/Toolbar.js"></script>
+    <script src="./ts/modules/Formatar/Formatar.js"></script>
+</body>
+</html>

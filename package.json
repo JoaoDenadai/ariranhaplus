@@ -1,0 +1,52 @@
+{
+  "name": "ariranhaplus",
+  "version": "0.0.1",
+  "description": "",
+  "main": "./src/Main/Main.js",
+  "scripts": {
+    "eslint": "eslint .",
+    "compile": "tsc",
+    "exec": "electron .",
+    "fast": "eslint . && tsc && electron ."
+  },
+  "keywords": [],
+  "author": {
+    "name": "João Denadai",
+    "email": "denadai.contato@gmail.com"
+  },
+  "build": {
+    "appId": "com.ariranhaplus.app",
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "JoaoDenadai",
+        "repo": "ariranhaplus",
+        "releaseType": "release"
+      }
+    ],
+    "linux": {
+      "icon": "./public/assets/otter.png",
+      "maintainer": "JoaoDenadai",
+      "target": [
+        "deb", "appImage", "snap", "rpm"
+      ],
+      "category": "Utility"
+    }
+  },
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@eslint/js": "^9.30.1",
+    "@types/electron": "^1.4.38",
+    "@types/node": "^24.0.10",
+    "@typescript-eslint/eslint-plugin": "^8.36.0",
+    "electron": "^37.2.0",
+    "eslint": "^9.30.1",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.36.0"
+  },
+  "dependencies": {
+    "electron-builder": "^26.0.12",
+    "electron-updater": "^6.6.2"
+  }
+}

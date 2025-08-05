@@ -1,0 +1,27 @@
+#loader-container{
+    margin-top: 35px;
+    width: 100vw;
+    height: 2px;
+    background-color: #f1f3f4;
+}
+
+#loader{
+    width: 5vw;
+    height: 2px;
+    background-color: #1A73E8;
+    position: relative;
+    left: -40%;
+    animation: none;
+}
+
+
+@keyframes slide {
+    0% {
+      left: -40%;
+      width: 5vw;
+    }
+    100% {
+      left: 100vw;
+      width: 75vw;
+    }
+  }
