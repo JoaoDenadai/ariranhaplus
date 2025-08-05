@@ -43,11 +43,7 @@ async function createMainWindow(): Promise<Window | void> {
   }
 
   events(mWindow);
-
   await mWindow.awaitFocus();
-
-  Updater.init(mWindow);
-  Updater.checkForUpdates();
 
   return mWindow;
 }
@@ -58,4 +54,8 @@ async function createMainWindow(): Promise<Window | void> {
   const AppWindow: Window = await createMainWindow() as Window;
 
   Popup.Set().Parent(AppWindow);
+
+  Updater.init(AppWindow);
+  Updater.checkForUpdates();
+
 })();
