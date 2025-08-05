@@ -4,7 +4,6 @@ import Popup from "../Modules/Core/Popup/Popup";
 import Errno from "../Modules/Core/Logs/Errno";
 import events from "./Main.Process";
 
-import { clipboard, Clipboard, globalShortcut, GlobalShortcut } from "electron";
 import { Updater } from "../Modules/Updater/Updater";
 
 async function createMainWindow(): Promise<Window | void> {
@@ -15,14 +14,13 @@ async function createMainWindow(): Promise<Window | void> {
     mWindow = new Window({
       width: 600,
       height: 250,
-      minWidth: 300,
+      minWidth: 475,
       maxWidth: 700,
-      minHeight: 150,
+      minHeight: 225,
       maxHeight: 260,
       show: false,
       frame: false,
       webPreferences: {
-        sandbox: true,
         nodeIntegration: false,
         contextIsolation: true,
         preload: Path.join(__dirname, "Main.Preload.js"),
@@ -45,6 +43,7 @@ async function createMainWindow(): Promise<Window | void> {
   }
 
   events(mWindow);
+
   await mWindow.awaitFocus();
 
   Updater.init(mWindow);
@@ -54,6 +53,8 @@ async function createMainWindow(): Promise<Window | void> {
 }
 
 (async function main() {
+  Instance.commandLine.appendSwitch("no-sandbox");
+
   await Instance.whenReady();
   const AppWindow: Window = await createMainWindow() as Window;
 
