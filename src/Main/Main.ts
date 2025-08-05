@@ -18,7 +18,7 @@ async function createMainWindow(): Promise<Window | void> {
       minWidth: 300,
       maxWidth: 700,
       minHeight: 150,
-      maxHeight: 275,
+      maxHeight: 260,
       show: false,
       frame: false,
       webPreferences: {
