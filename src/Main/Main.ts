@@ -53,7 +53,6 @@ async function createMainWindow(): Promise<Window | void> {
 }
 
 (async function main() {
-  Instance.commandLine.appendSwitch("no-sandbox");
 
   await Instance.whenReady();
   const AppWindow: Window = await createMainWindow() as Window;

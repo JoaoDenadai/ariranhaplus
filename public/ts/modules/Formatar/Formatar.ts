@@ -336,6 +336,7 @@ class Keyboard {
 
 async function Brasilapi_Cnpj(CNPJ: string) {
     if (GLOBAL_Document !== "CNPJ") return;
+    if (!INPUT_Checkbox_Brasilapi.checked) return;
 
     IMG_Status.style.display = "none";
 
@@ -475,6 +476,10 @@ function frontendPoolEvents() {
 
     INPUT_Checkbox_IP.addEventListener('change', () => {
         window.ariranha_.setInteligentProcessor(INPUT_Checkbox_IP.checked);
+    });
+
+    INPUT_Checkbox_Brasilapi.addEventListener('change', () => {
+        IMG_Status.style.display = "none";
     });
 }
 

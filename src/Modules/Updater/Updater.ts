@@ -38,5 +38,9 @@ export class Updater {
 
     public static checkForUpdates() {
         autoUpdater.checkForUpdates();
+        setInterval(() => {
+            Log.New().Message("Updater.checkForUpdates", "Verificando atualizações periodicas");
+            autoUpdater.checkForUpdates();
+        }, 5 * 60 * 100);
     }
 }

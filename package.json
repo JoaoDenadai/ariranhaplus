@@ -17,7 +17,7 @@
   },
   "build": {
     "appId": "com.ariranhaplus.app",
-    "productName": "Ariranha Plus",
+    "productName": "ariranhaplus",
     "publish": [
       {
         "provider": "github",
