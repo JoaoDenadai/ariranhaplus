@@ -19,6 +19,6 @@ contextBridge.exposeInMainWorld("ariranha_", {
         return await ipcRenderer.invoke('Clipboard: Copy', content);
     },
     setInteligentProcessor: async (Enabled: boolean) => {
-        return await ipcRenderer.invoke('IP', Enabled);
+        return await ipcRenderer.invoke('SmartFormat', Enabled);
     },
 });

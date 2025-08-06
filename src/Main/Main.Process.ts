@@ -1,15 +1,18 @@
 import { ipcMain, clipboard } from 'electron';
-import { Instance } from '../Libraries/Libraries';
 import App from "../../package.json";
 import Popup from '../Modules/Core/Popup/Popup';
 import SysWindow from '../Modules/Core/Window/Window';
+import { Instance } from '../Libraries/Libraries';
 
 let clipboardInterval: NodeJS.Timeout | null = null;
 
-export default function events(mWindow: SysWindow) {
+export default function Events(mWindow: SysWindow) {
     mWindow.on('close', (event) => {
-        event.preventDefault();
-        mWindow.hide();
+        if (clipboardInterval) {
+            clearInterval(clipboardInterval);
+            clipboardInterval = null;
+        }
+        Instance.exit();
     });
 
     ipcMain.on('Main', (event, message: string) => {
@@ -33,12 +36,14 @@ export default function events(mWindow: SysWindow) {
         clipboard.writeText(content);
     });
 
-    ipcMain.handle("IP", (Event, Enabled) => {
+    ipcMain.handle("SmartFormat", (Event, Enabled) => {
         if (Enabled) {
             if (clipboardInterval) return;
             clipboardInterval = setInterval(() => {
                 const text = clipboard.readText();
-                if (!text || text.length > 20) return;
+                if (!text) return;
+                if (text.length > 20) return;
+
                 mWindow.webContents.send("Clipboard", text);
             }, 200);
         } else {

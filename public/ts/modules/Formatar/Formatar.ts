@@ -11,7 +11,7 @@ const DIV_Document_Group = document.getElementById('MENU_Documents') as HTMLElem
 const INPUT_Document = document.getElementById('INPUT_USER-Document') as HTMLInputElement;
 const SELECT_State = document.getElementById('SELECT_USER-State') as HTMLSelectElement;
 const INPUT_Checkbox_AutoCopy = document.getElementById('INPUT_Checkbox_AutoCopy') as HTMLInputElement;
-const INPUT_Checkbox_IP = document.getElementById('INPUT_Checkbox_IP') as HTMLInputElement;
+const INPUT_Checkbox_IP = document.getElementById('INPUT_Checkbox_SmartFormat') as HTMLInputElement;
 const INPUT_Checkbox_Brasilapi = document.getElementById('INPUT_Checkbox_Brasilapi') as HTMLInputElement;
 
 

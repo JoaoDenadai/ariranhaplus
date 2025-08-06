@@ -3,7 +3,7 @@ import SysWindow from "../Modules/Core/Window/Window";
 import Log from "../Modules/Core/Logs/Logs";
 import Popup from "../Modules/Core/Popup/Popup";
 import Errno from "../Modules/Core/Errno/Errno";
-import events from "./Main.Process";
+import Events from "./Main.Process";
 
 import { Updater } from "../Modules/Updater/Updater";
 
@@ -67,7 +67,7 @@ async function createMainWindow(): Promise<SysWindow | void> {
   const mWindow_events = async () => {
     try {
       if (!mWindow) return;
-      events(mWindow);
+      Events(mWindow);
       await mWindow.awaitFocus();
     } catch (error: unknown) {
       await Popup.New().Error("Erro ao registrar eventos da janela", Errno.onError(error), undefined, true);

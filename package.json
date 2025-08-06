@@ -1,6 +1,6 @@
 {
   "name": "ariranhaplus",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "",
   "main": "./src/Main/Main.js",
   "scripts": {
@@ -8,7 +8,7 @@
     "compile": "tsc",
     "exec": "electron .",
     "fast": "eslint . && tsc && electron .",
-    "build": "electron-builder"
+    "build": "eslint . && tsc && electron-builder"
   },
   "keywords": [],
   "author": {
@@ -17,7 +17,7 @@
   },
   "build": {
     "appId": "com.ariranhaplus.app",
-    "productName": "ariranhaplus",
+    "productName": "AriranhaPlus",
     "publish": [
       {
         "provider": "github",
