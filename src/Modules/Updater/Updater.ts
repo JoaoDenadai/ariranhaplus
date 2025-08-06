@@ -1,10 +1,10 @@
 import { autoUpdater } from "electron-updater";
-import Window from "../Core/Window/Window";
+import SysWindow from "../Core/Window/Window";
 import Log from "../Core/Logs/Logs";
 import Popup from "../Core/Popup/Popup";
 
 export class Updater {
-    public static init(mainWindow: Window) {
+    public static init(mainWindow: SysWindow) {
         autoUpdater.autoDownload = false;
 
         autoUpdater.on("checking-for-update", () => {

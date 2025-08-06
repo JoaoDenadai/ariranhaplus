@@ -1,17 +1,37 @@
 import { Instance, Path } from "../Libraries/Libraries";
-import Window from "../Modules/Core/Window/Window";
+import SysWindow from "../Modules/Core/Window/Window";
+import Log from "../Modules/Core/Logs/Logs";
 import Popup from "../Modules/Core/Popup/Popup";
-import Errno from "../Modules/Core/Logs/Errno";
+import Errno from "../Modules/Core/Errno/Errno";
 import events from "./Main.Process";
 
 import { Updater } from "../Modules/Updater/Updater";
 
-async function createMainWindow(): Promise<Window | void> {
+let mWindow: SysWindow | undefined;
+
+function singleInstanceLock(): boolean {
+  const mLock = Instance.requestSingleInstanceLock();
+
+  if (!mLock) {
+    Instance.quit();
+    return false;
+  }
+
+  Instance.once("second-instance", () => {
+    if (mWindow) {
+      if (mWindow.isMinimized()) mWindow.restore();
+      mWindow.focus();
+    }
+  });
+
+  return true;
+}
+
+async function createMainWindow(): Promise<SysWindow | void> {
   if (!Instance.isReady()) await Instance.whenReady();
 
-  let mWindow: Window;
   try {
-    mWindow = new Window({
+    mWindow = new SysWindow({
       width: 600,
       height: 250,
       minWidth: 475,
@@ -33,7 +53,9 @@ async function createMainWindow(): Promise<Window | void> {
   }
 
   mWindow.on('ready-to-show', () => {
-    mWindow.show();
+    if (mWindow) {
+      mWindow.show();
+    }
   });
 
   try {
@@ -42,16 +64,31 @@ async function createMainWindow(): Promise<Window | void> {
     await Popup.New().Error("Erro ao abrir a janela", Errno.onError(error), undefined, true);
   }
 
-  events(mWindow);
-  await mWindow.awaitFocus();
+  const mWindow_events = async () => {
+    try {
+      if (!mWindow) return;
+      events(mWindow);
+      await mWindow.awaitFocus();
+    } catch (error: unknown) {
+      await Popup.New().Error("Erro ao registrar eventos da janela", Errno.onError(error), undefined, true);
+    }
+  };
+
+  mWindow_events();
 
   return mWindow;
 }
 
 (async function main() {
+  const mLock = singleInstanceLock();
+  if (!mLock) {
+    Log.New().Error("main", "Não é possível abrir mais de uma instância do programa.");
+    Log.New().Message("main", "Focando para instância já aberta e encerrando a segunda chamada.");
+    return;
+  };
 
   await Instance.whenReady();
-  const AppWindow: Window = await createMainWindow() as Window;
+  const AppWindow: SysWindow = await createMainWindow() as SysWindow;
 
   Popup.Set().Parent(AppWindow);
 

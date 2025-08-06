@@ -9,7 +9,7 @@ import Log from "../Logs/Logs";
  *  Classe principal a ser exportada.
  *  Observação: Ela extende a classe BrowserWindow, com isso, é necessária inicialização com super.
  */
-export default class Window extends BrowserWindow {
+export default class SysWindow extends BrowserWindow {
   /*
    *  Window
    *  Essa função trabalha tanto com métodos estáticos e dinâmicos (Por objeto).
