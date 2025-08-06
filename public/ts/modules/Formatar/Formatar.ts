@@ -366,8 +366,13 @@ function isCNPJForBrasilapi() {
 
 window.ariranha_.getClipboard((text) => {
     if (GLOBAL_lastFormatedClipboard === text) return;
-    const Document = new Formatar().formatDocumentEvent(text);
-    window.ariranha_.sendClipboard(Document);
+    const tempBuffer = new Formatar();
+    const Document = tempBuffer.formatDocumentEvent(text);
+    if (!tempBuffer.GLOBAL_isFormated) {
+        window.ariranha_.sendClipboard(text);
+    } else {
+        window.ariranha_.sendClipboard(Document);
+    }
 });
 
 function frontendPoolEvents() {

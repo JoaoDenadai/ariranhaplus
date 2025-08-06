@@ -3,7 +3,6 @@
  *  Arquivo principal de criação e gerenciamento de janelas.
  */
 import { BrowserWindow, Preferences } from "../../../Libraries/Libraries";
-import Log from "../Logs/Logs";
 
 /*
  *  Classe principal a ser exportada.

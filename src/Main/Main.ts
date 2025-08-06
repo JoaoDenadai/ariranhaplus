@@ -80,6 +80,7 @@ async function createMainWindow(): Promise<SysWindow | void> {
 }
 
 (async function main() {
+
   const mLock = singleInstanceLock();
   if (!mLock) {
     Log.New().Error("main", "Não é possível abrir mais de uma instância do programa.");
@@ -94,5 +95,4 @@ async function createMainWindow(): Promise<SysWindow | void> {
 
   Updater.init(AppWindow);
   Updater.checkForUpdates();
-
 })();

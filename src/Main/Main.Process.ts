@@ -7,12 +7,9 @@ import SysWindow from '../Modules/Core/Window/Window';
 let clipboardInterval: NodeJS.Timeout | null = null;
 
 export default function events(mWindow: SysWindow) {
-    mWindow.on('close', () => {
-        if (clipboardInterval) {
-            clearInterval(clipboardInterval);
-            clipboardInterval = null;
-        }
-        Instance.exit();
+    mWindow.on('close', (event) => {
+        event.preventDefault();
+        mWindow.hide();
     });
 
     ipcMain.on('Main', (event, message: string) => {
@@ -41,13 +38,8 @@ export default function events(mWindow: SysWindow) {
             if (clipboardInterval) return;
             clipboardInterval = setInterval(() => {
                 const text = clipboard.readText();
-                // Bug versão 0.0.2
-                // Corrigido problema ao copiar imagens, onde, a imagem não permanecia na área de transferência
-                // Dessa forma, adicionado !text, ele impede que, ao ser imagem, ele sobreponha o conteúdo.
                 if (!text || text.length > 20) return;
                 mWindow.webContents.send("Clipboard", text);
-
-                console.log(text);
             }, 200);
         } else {
             if (clipboardInterval) {
