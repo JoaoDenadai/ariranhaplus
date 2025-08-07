@@ -33,11 +33,11 @@ async function createMainWindow(): Promise<SysWindow | void> {
   try {
     mWindow = new SysWindow({
       width: 600,
-      height: 250,
-      minWidth: 475,
-      maxWidth: 700,
-      minHeight: 225,
-      maxHeight: 260,
+      height: 600,
+      //minWidth: 475,
+      //maxWidth: 700,
+      // minHeight: 225,
+      //maxHeight: 260,
       show: false,
       frame: false,
       webPreferences: {
@@ -63,6 +63,8 @@ async function createMainWindow(): Promise<SysWindow | void> {
   } catch (error: unknown) {
     await Popup.New().Error("Erro ao abrir a janela", Errno.onError(error), undefined, true);
   }
+
+  mWindow.webContents.openDevTools();
 
   const mWindow_events = async () => {
     try {

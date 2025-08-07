@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./styles/Titlebar.css">
     <link rel="stylesheet" href="./styles/Loader.css">
-    <link rel="stylesheet" href="./styles/Footer.css">
     <link rel="stylesheet" href="./styles/Tooltip.css">
-    <link rel="stylesheet" href="./ts/modules/Formatar/Toolbar.css">
+    <link rel="stylesheet" href="./globals/Toolbar.css">
     <link rel="stylesheet" href="./ts/modules/Formatar/Formatar.css">
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 </head>
 <body>
     <div id="Window-titlebar">
@@ -26,7 +26,8 @@
         <div id="loader"></div>
     </div>
 
-    <div>
+    <!--
+    <div class="MAIN">
         <div>
             <div id="toolbar-container">
                 <div id="toolbar-formatar">Formatar</div>
@@ -34,7 +35,7 @@
             </div>
     
             <div class="DIV_MODULE_Formatar" id="CONTENT">
-                <div class="DIVISION" data-screen="Formatar" id="FORMATAR">
+                                <div class="DIVISION" data-screen="Formatar" id="FORMATAR">
                     <div class="MENU_Entity" id="MENU_Entity">
                         <div data-type="JURIDICA">Jurídica</div>
                         <div data-type="FISICA"="">Física</div>
@@ -96,9 +97,10 @@
                     </div>
         
                 </div>
+
                 <div class="DIVISION" data-screen="Configurar" id="CONFIGURAR">
                     <div id="MENU_Configuracoes_opcoes">
-                        <!--<div id="toolbar-gerais">Gerais</div>-->
+                        <div id="toolbar-gerais">Gerais</div>
                         <div id="toolbar-buffer">Buffer</div>
                     </div>
                     <div class="MENU_Configuracoes_buffer" data-type="BUFFER">
@@ -109,18 +111,24 @@
             </div>
         </div>
     </div>
+    -->
 
-    <footer>
 
-    </footer>
+    <main id="MAIN">
+        <div class="TOOLBAR" id="TOOLBAR">
+        </div>
+        <div class="CONTENT" id="CONTENT">
+            <div data-screen="Elemento 1"><labe>Conteúdo da tela "Elemento 1"</labe></div>
+            <div data-screen="Elemento 2">Conteúdo da tela "Elemento 2"</div>
+            <div data-screen="Elemento 3">Conteúdo da tela "Elemento 3"</div>
+        </div>
+    </main>
   
     
 
     <script src="./ts/Functions.js"></script>
     <script src="./ts/modules/Window/Titlebar.js"></script>
-    <script src="./ts/modules/Formatar/Menu.js"></script>
-    <script src="./ts/modules/Formatar/Config.js"></script>
-    <script src="./ts/modules/Window/Toolbar.js"></script>
-    <script src="./ts/modules/Formatar/Formatar.js"></script>
+    <script src="./globals/Toolbar.js"></script>
+
 </body>
 </html>

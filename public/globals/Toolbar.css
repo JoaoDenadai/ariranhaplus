@@ -1,0 +1,46 @@
+.TOOLBAR{
+    display: flex;
+    flex-direction: row;
+
+    background-color: #f1f3f4;
+
+    height: 30px;
+    width: 100vw;
+}
+
+.TOOLBAR div{
+    height: 100%;
+    width: 15vw;
+    display: flex;
+
+    justify-content: space-around;
+    align-items: center;
+    position: relative;
+
+    background-color: #f1f3f4;
+
+    font-size: 12px;
+}
+
+.TOOLBAR div img{
+    height: 10px;
+    width: 10px;
+
+    opacity: 50%;
+}
+
+
+.TOOLBAR div img:hover{
+    cursor: pointer;
+    opacity: 85%;
+}
+
+
+.TOOLBAR div:hover{
+    background-color: #fbfbfb;
+    cursor: pointer;
+}
+
+#TOOLBAR > div.drag-over {
+    border: 2px dashed blue;
+  }
