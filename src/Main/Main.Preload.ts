@@ -1,7 +1,6 @@
 import { contextBridge, ipcRenderer } from "electron";
 import Popup from "../Modules/Core/Popup/Popup";
 
-
 contextBridge.exposeInMainWorld("ariranha_", {
     Action: (message: string) => {
         ipcRenderer.send("Main", message);
@@ -21,4 +20,16 @@ contextBridge.exposeInMainWorld("ariranha_", {
     setInteligentProcessor: async (Enabled: boolean) => {
         return await ipcRenderer.invoke('SmartFormat', Enabled);
     },
+});
+
+contextBridge.exposeInMainWorld("WebContent", {
+    Log: (Callback: (Message: string, Type: LogTypes) => void) => {
+        ipcRenderer.on("New: Log", (event, Message, Type) => Callback(Message, Type));
+    }
+});
+
+contextBridge.exposeInMainWorld("Plugins_", {
+    initCss: (Callback: (CssCode: string) => void) => {
+        ipcRenderer.on("Plugins: Css (init)", (event, CssCode) => Callback(CssCode));
+    }
 });

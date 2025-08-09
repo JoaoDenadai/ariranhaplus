@@ -30,7 +30,10 @@
       "icon": "./public/assets/otter.png",
       "maintainer": "JoaoDenadai",
       "target": [
-        "deb", "appImage", "snap", "rpm"
+        "deb",
+        "appImage",
+        "snap",
+        "rpm"
       ],
       "category": "Utility"
     }
@@ -39,16 +42,18 @@
   "type": "commonjs",
   "devDependencies": {
     "@eslint/js": "^9.30.1",
+    "@types/acorn": "^4.0.6",
     "@types/electron": "^1.4.38",
     "@types/node": "^24.0.10",
-    "@typescript-eslint/eslint-plugin": "^8.36.0",
+    "@typescript-eslint/eslint-plugin": "^8.39.0",
+    "@typescript-eslint/parser": "^8.39.0",
     "electron": "^37.2.0",
-    "eslint": "^9.30.1",
-    "typescript": "^5.8.3",
-    "typescript-eslint": "^8.36.0",
-    "electron-builder": "^26.0.12"
+    "electron-builder": "^26.0.12",
+    "eslint": "^9.33.0",
+    "typescript": "^5.9.2"
   },
   "dependencies": {
+    "acorn": "^8.15.0",
     "electron-updater": "^6.6.2"
   }
 }

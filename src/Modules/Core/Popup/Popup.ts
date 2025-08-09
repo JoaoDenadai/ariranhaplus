@@ -13,7 +13,7 @@ import { ipcMain } from 'electron';
 /*
  *  Importa dependências de outros classes.
  */
-import Log from "../Logs/Logs";
+import { Log } from "../Logs/Logs";
 import SysWindow from "../Window/Window";
 
 export default class Popup {

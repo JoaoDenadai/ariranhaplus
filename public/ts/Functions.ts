@@ -1,3 +1,4 @@
+
 class UI<T> {
     public static async Loading<T>(Function: () => Promise<T>) {
         const Loader = document.getElementById("loader") as HTMLElement;
@@ -23,8 +24,9 @@ class Tooltip {
 
         // Função para mostrar tooltip
         function showTooltip(e: any) {
-            const text = e.target.dataset.tooltip?.replace(/\\n/g, '\n');
+            let text: string = (e.target.dataset.tooltip);
             if (!text) return;
+            text = text.replace(/\\n/g, '\n');
 
             const lines = text.split("\n");
             let html = "";
@@ -75,3 +77,26 @@ class Tooltip {
     }
 }
 Tooltip.showTooltip();
+
+window.WebContent.Log((msg, type) => {
+    switch (type) {
+        case "Error": {
+            console.error(msg);
+            break;
+        }
+        case "Message": {
+            console.log(msg);
+            break;
+        }
+        case "Warning": {
+            console.warn(msg);
+            break;
+        }
+    }
+});
+
+window.Plugins_.initCss((Css: string) => {
+    const fromPlugin = document.createElement('style');
+    fromPlugin.textContent = Css;
+    document.head.appendChild(fromPlugin);
+});

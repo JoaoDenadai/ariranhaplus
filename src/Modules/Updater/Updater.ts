@@ -1,6 +1,6 @@
 import { autoUpdater } from "electron-updater";
 import SysWindow from "../Core/Window/Window";
-import Log from "../Core/Logs/Logs";
+import { Log } from "../Core/Logs/Logs";
 import Popup from "../Core/Popup/Popup";
 
 export class Updater {

@@ -1,9 +1,10 @@
-import { Instance, Path } from "../Libraries/Libraries";
+import { Filesystem, Instance, Path } from "../Libraries/Libraries";
 import SysWindow from "../Modules/Core/Window/Window";
-import Log from "../Modules/Core/Logs/Logs";
+import { Log, Web } from "../Modules/Core/Logs/Logs";
 import Popup from "../Modules/Core/Popup/Popup";
 import Errno from "../Modules/Core/Errno/Errno";
 import Events from "./Main.Process";
+import Plugin from "../Plugins/Plugins";
 
 import { Updater } from "../Modules/Updater/Updater";
 
@@ -34,10 +35,6 @@ async function createMainWindow(): Promise<SysWindow | void> {
     mWindow = new SysWindow({
       width: 600,
       height: 600,
-      //minWidth: 475,
-      //maxWidth: 700,
-      // minHeight: 225,
-      //maxHeight: 260,
       show: false,
       frame: false,
       webPreferences: {
@@ -52,31 +49,35 @@ async function createMainWindow(): Promise<SysWindow | void> {
     return;
   }
 
-  mWindow.on('ready-to-show', () => {
-    if (mWindow) {
-      mWindow.show();
-    }
-  });
-
   try {
     mWindow.loadFile(Path.join(__dirname, "../", "../", "public", "Main.html"));
   } catch (error: unknown) {
     await Popup.New().Error("Erro ao abrir a janela", Errno.onError(error), undefined, true);
   }
 
-  mWindow.webContents.openDevTools();
+  try {
+    if (!mWindow) return;
+    Events(mWindow);
+  } catch (error: unknown) {
+    await Popup.New().Error("Erro ao registrar eventos da janela", Errno.onError(error), undefined, true);
+  }
 
-  const mWindow_events = async () => {
-    try {
-      if (!mWindow) return;
-      Events(mWindow);
-      await mWindow.awaitFocus();
-    } catch (error: unknown) {
-      await Popup.New().Error("Erro ao registrar eventos da janela", Errno.onError(error), undefined, true);
+  await new Promise<void>((resolve, reject) => {
+    if (!mWindow) {
+      reject();
+      return;
     }
-  };
 
-  mWindow_events();
+    mWindow.webContents.on('did-finish-load', async () => {
+      if (mWindow) {
+        mWindow.show();
+        await mWindow.awaitFocus();
+      }
+      resolve();
+    });
+  });
+
+  mWindow.webContents.openDevTools();
 
   return mWindow;
 }
@@ -84,17 +85,20 @@ async function createMainWindow(): Promise<SysWindow | void> {
 (async function main() {
 
   const mLock = singleInstanceLock();
+
   if (!mLock) {
     Log.New().Error("main", "Não é possível abrir mais de uma instância do programa.");
     Log.New().Message("main", "Focando para instância já aberta e encerrando a segunda chamada.");
     return;
   };
 
+
   await Instance.whenReady();
-  const AppWindow: SysWindow = await createMainWindow() as SysWindow;
+  await createMainWindow();
 
-  Popup.Set().Parent(AppWindow);
+  Popup.Set().Parent(mWindow as SysWindow);
+  const Plugins = new Plugin(mWindow as SysWindow);
 
-  Updater.init(AppWindow);
+  Updater.init(mWindow as SysWindow);
   Updater.checkForUpdates();
 })();

@@ -5,7 +5,7 @@ let ChildrensToolbar: HTMLElement[];
 let ChildrensContent: HTMLElement[];
 
 interface ToolbarElements {
-    title: string,
+    title: string | undefined,
     toolbarElement: HTMLDivElement,
     contentElementDataset: string
 }
@@ -18,6 +18,10 @@ class Toolbar {
     constructor(toolbar: HTMLDivElement, content: HTMLDivElement) {
         this.Toolbar_Container = toolbar;
         this.Content_Container = content;
+        (Array.from(toolbar.children) as HTMLElement[]).forEach((children) => {
+            this.Toolbar_Elements.push({ title: children.id ?? undefined, toolbarElement: children as HTMLDivElement, contentElementDataset: "Add" });
+            this.addPoolEvents(children);
+        });
     }
 
     public getDatasetByToolbarElementId(element: HTMLElement) {
@@ -167,6 +171,7 @@ class Toolbar {
         element.addEventListener("mousedown", (event: MouseEvent) => {
             if ((event.target as HTMLElement).classList.contains("close")) return;
             let movimentEnabled: boolean = false;
+            const originalPosition = element.style.left;
 
             const cursorPositionX = event.clientX;
 
@@ -178,10 +183,19 @@ class Toolbar {
                 const movimentCapToMove = 20;
                 const delta = onMouseMoveEvent.clientX - cursorPositionX;
 
-                if (delta > movimentCapToMove || delta < movimentCapToMove * -1 || movimentEnabled) {
-                    element.style.left = `${getLeft + delta}px`;
+                if (Math.abs(delta) > movimentCapToMove || movimentEnabled) {
+                    let newLeft = getLeft + delta;
+                    element.style.left = `${newLeft}px`;
+                    const WindowRect = element.getBoundingClientRect();
+
+                    if (WindowRect.left < 0) {
+                        newLeft = newLeft - WindowRect.left;
+                        element.style.left = `${newLeft}px`;
+                        movimentEnabled = false;
+                    } else {
+                        movimentEnabled = true;
+                    }
                     element.style.zIndex = "2";
-                    movimentEnabled = true;
                 }
             }
 
@@ -198,6 +212,10 @@ class Toolbar {
 
                 let targetSiblingIndex = -1;
                 for (let i = 0; i < siblings.length; i++) {
+                    const actualSibling = siblings[i] as HTMLElement;
+                    if (actualSibling.dataset.property?.includes(("Fixed").toLowerCase())) {
+                        break;
+                    };
                     const actualSiblingRect = siblings[i].getBoundingClientRect();
                     const actualSiblingCenter = actualSiblingRect.left + actualSiblingRect.width / 2;
 
@@ -224,26 +242,34 @@ class Toolbar {
             document.addEventListener("mouseup", onMouseUp);
         });
     }
+
+    public addCustomPoolEventsCallback(element: HTMLElement, PoolFunction: (el: HTMLElement) => void) {
+
+        const replace = element.cloneNode(true);
+
+        const index = this.Toolbar_Elements.findIndex(item => item.toolbarElement === element);
+        if (index !== -1) {
+            this.Toolbar_Elements[index].toolbarElement = replace as HTMLDivElement;
+        }
+
+        console.log(element);
+        element.parentNode?.replaceChild(replace, element);
+        console.log(replace);
+        PoolFunction(replace as HTMLElement);
+    }
+
+    public addCustomPoolEventsCallbackByTitle(title: string, PoolFunction: (el: HTMLElement) => void) {
+        const index = this.Toolbar_Elements.findIndex((item) => item.title === title);
+        if (index === -1) return;
+
+        const getContent = this.Toolbar_Elements[index].toolbarElement;
+        const replace = this.Toolbar_Elements[index].toolbarElement.cloneNode(true);
+        this.Toolbar_Elements[index].toolbarElement = replace as HTMLDivElement;
+        this.Toolbar_Container.replaceChild(replace, getContent);
+        PoolFunction(replace as HTMLElement);
+    }
 }
 
-const TOOLBAR_ELEMENTS: string[] = ["Elemento 1", "Elemento 2", "Elemento 3"];
-
 (function main() {
-    const ToolbarObj = new Toolbar(DIV_Toolbar, DIV_Content);
-    ToolbarObj.addElementsByStringArray(TOOLBAR_ELEMENTS);
-
-    const el = document.createElement("label");
-    el.textContent = "Hello World";
-    ToolbarObj.addNewElement(el, "Abanova");
-    console.log(ToolbarObj.sortToolbarElements());
-
-    document.addEventListener("click", () => {
-        if (ToolbarObj.Toolbar_Elements.length === 0) {
-            const body = document.getElementsByTagName("body")[0];
-            body.style.backgroundColor = "#f1f3f4";
-        } else {
-            const body = document.getElementsByTagName("body")[0];
-            body.style.backgroundColor = "";
-        }
-    });
+    const mainToolbar = new Toolbar(DIV_Toolbar, DIV_Content);
 })();

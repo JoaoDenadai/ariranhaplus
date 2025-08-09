@@ -3,6 +3,9 @@ export { };
 
 declare global {
     type Application = typeof App;
+    interface Api {
+        getHtmlFile: (filePath: string) => any
+    }
 
     interface MessageBoxData {
         Type: string,
@@ -11,7 +14,15 @@ declare global {
         Description: string,
     };
 
-    type PopupTypes = "Message" | "Confirm" | "Warning" | "Error"
+    interface PluginData {
+        name: string,
+        version: string,
+        init: (api: Api) => any;
+        css: () => string;
+    }
+
+    type PopupTypes = "Message" | "Confirm" | "Warning" | "Error";
+    type LogTypes = "Message" | "Warning" | "Error";
 
     interface Window {
         Popup_: {
@@ -26,5 +37,11 @@ declare global {
             sendClipboard: (content: string) => Promise<any>;
             setInteligentProcessor: (Enabled: boolean) => Promise<any>;
         };
+        WebContent: {
+            Log: (Callback: (Message: string, Type: LogTypes) => void) => void
+        }
+        Plugins_: {
+            initCss: (Callback: (CssCode: string) => void) => void
+        }
     }
 }

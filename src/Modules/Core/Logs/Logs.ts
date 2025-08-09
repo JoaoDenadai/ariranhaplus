@@ -4,15 +4,15 @@
  */
 import { Prompt } from "../../../Libraries/Libraries";
 import Time from "../Time/Time";
+import SysWindow from "../Window/Window";
 
 
-export default class Log {
+export class Log {
   /*
    *  Log
    *  Classe responsável por todos os métodos de manipulação e geração de Logs de Eventos do
    *  sistema.
    */
-
   private static Format(Function: string, Content: string, Tag: string): string {
     /*
      *  Format
@@ -43,7 +43,34 @@ export default class Log {
         Prompt.error(this.Format(Function, Content, "Error"));
       },
       Critical: (Function: string, Content: string) => {
-        throw new Error(this.Format(Function, Content, "Error"));
+        throw new Error(this.Format(Function, Content, "Critical"));
+      }
+    };
+  }
+}
+
+export class Web {
+  private Parent: SysWindow;
+
+  constructor(Window: SysWindow) {
+    this.Parent = Window;
+  }
+
+  private Format(Function: string, Content: string, Tag: string): string {
+    const getTime = Time.getTime("pt-BR").from("America/Sao_Paulo");
+    return `[${getTime.hours}] [${Tag}] [${Function}] ${Content}`;
+  }
+
+  public New() {
+    return {
+      Message: (Function: string, Content: string) => {
+        this.Parent.webContents.send("New: Log", this.Format(Function, Content, "Message"), "Message");
+      },
+      Warning: (Function: string, Content: string) => {
+        this.Parent.webContents.send("New: Log", this.Format(Function, Content, "Warning"), "Warning");
+      },
+      Error: (Function: string, Content: string) => {
+        this.Parent.webContents.send("New: Log", this.Format(Function, Content, "Error"), "Error");
       }
     };
   }
