@@ -2,13 +2,15 @@
   "name": "ariranhaplus",
   "version": "0.0.5",
   "description": "",
-  "main": "./src/Main/Main.js",
+  "main": "./src/js/Main/Main.js",
   "scripts": {
     "eslint": "eslint .",
-    "compile": "tsc",
+    "build:main": "tsc -p src/tsconfig.main.json",
+    "build:renderer": "tsc -p public/tsconfig.renderer.json",
+    "compile": "npm run build:main && npm run build:renderer",
     "exec": "electron .",
-    "fast": "eslint . && tsc && electron .",
-    "build": "eslint . && tsc && electron-builder"
+    "fast": "eslint . && npm run compile && electron .",
+    "build": "eslint . && npm run compile && electron-builder"
   },
   "keywords": [],
   "author": {
@@ -43,6 +45,7 @@
   "devDependencies": {
     "@eslint/js": "^9.30.1",
     "@types/acorn": "^4.0.6",
+    "@types/cheerio": "^0.22.35",
     "@types/electron": "^1.4.38",
     "@types/node": "^24.0.10",
     "@typescript-eslint/eslint-plugin": "^8.39.0",
@@ -54,6 +57,7 @@
   },
   "dependencies": {
     "acorn": "^8.15.0",
+    "cheerio": "^1.1.2",
     "electron-updater": "^6.6.2"
   }
 }

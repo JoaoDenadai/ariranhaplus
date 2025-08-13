@@ -95,7 +95,7 @@ export default class Popup {
             /*  Carrega o conteúdo da janela.
              *  Caso o arquivo "Index.html" seja movido, precisa editar o caminho abaixo.
              */
-            await Popup.PopupWindow.loadFile(Path.join(__dirname, 'public', 'Index.html'));
+            await Popup.PopupWindow.loadFile(Path.join(__dirname, "./public/Index.html"));
         } catch (error) {
             Log.New().Error('MessageBox',
                 'Não foi possível carregar o conteúdo da janela de mensagem: ' + String(error)

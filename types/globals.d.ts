@@ -1,11 +1,8 @@
-import App from "../../package.json";
+import App from "../package.json";
 export { };
 
 declare global {
     type Application = typeof App;
-    interface Api {
-        getHtmlFile: (filePath: string) => any
-    }
 
     interface MessageBoxData {
         Type: string,
@@ -13,13 +10,6 @@ declare global {
         Message: string,
         Description: string,
     };
-
-    interface PluginData {
-        name: string,
-        version: string,
-        init: (api: Api) => any;
-        css: () => string;
-    }
 
     type PopupTypes = "Message" | "Confirm" | "Warning" | "Error";
     type LogTypes = "Message" | "Warning" | "Error";

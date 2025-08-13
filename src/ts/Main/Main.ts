@@ -4,7 +4,6 @@ import { Log, Web } from "../Modules/Core/Logs/Logs";
 import Popup from "../Modules/Core/Popup/Popup";
 import Errno from "../Modules/Core/Errno/Errno";
 import Events from "./Main.Process";
-import Plugin from "../Plugins/Plugins";
 
 import { Updater } from "../Modules/Updater/Updater";
 
@@ -50,7 +49,7 @@ async function createMainWindow(): Promise<SysWindow | void> {
   }
 
   try {
-    mWindow.loadFile(Path.join(__dirname, "../", "../", "public", "Main.html"));
+    mWindow.loadFile(Path.join(__dirname, "../../../public/Main.html"));
   } catch (error: unknown) {
     await Popup.New().Error("Erro ao abrir a janela", Errno.onError(error), undefined, true);
   }
@@ -97,7 +96,6 @@ async function createMainWindow(): Promise<SysWindow | void> {
   await createMainWindow();
 
   Popup.Set().Parent(mWindow as SysWindow);
-  const Plugins = new Plugin(mWindow as SysWindow);
 
   Updater.init(mWindow as SysWindow);
   Updater.checkForUpdates();

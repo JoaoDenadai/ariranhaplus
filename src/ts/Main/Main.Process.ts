@@ -1,5 +1,5 @@
 import { ipcMain, clipboard } from 'electron';
-import App from "../../package.json";
+import App from "../../../package.json";
 import Popup from '../Modules/Core/Popup/Popup';
 import SysWindow from '../Modules/Core/Window/Window';
 import { Instance } from '../Libraries/Libraries';
