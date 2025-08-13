@@ -1,5 +1,5 @@
 
-class UI<T> {
+class UI {
     public static async Loading<T>(Function: () => Promise<T>) {
         const Loader = document.getElementById("loader") as HTMLElement;
         if (!Loader) return await Function();

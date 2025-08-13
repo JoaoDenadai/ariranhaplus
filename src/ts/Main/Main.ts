@@ -4,6 +4,7 @@ import { Log, Web } from "../Modules/Core/Logs/Logs";
 import Popup from "../Modules/Core/Popup/Popup";
 import Errno from "../Modules/Core/Errno/Errno";
 import Events from "./Main.Process";
+import { PluginRuntime, __api__ } from "../Modules/Plugins/Plugins";
 
 import { Updater } from "../Modules/Updater/Updater";
 
@@ -91,11 +92,18 @@ async function createMainWindow(): Promise<SysWindow | void> {
     return;
   };
 
-
   await Instance.whenReady();
   await createMainWindow();
 
   Popup.Set().Parent(mWindow as SysWindow);
+
+  // Exemplo de uso
+  const api: __api__ = {
+    getVersion() { return "1.2.3"; },
+  };
+
+  const runtime = new PluginRuntime();
+  runtime.load(api);
 
   Updater.init(mWindow as SysWindow);
   Updater.checkForUpdates();
