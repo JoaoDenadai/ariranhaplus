@@ -32,6 +32,9 @@ declare global {
         }
         Plugins_: {
             initCss: (Callback: (CssCode: string) => void) => void
+            initJs: (Callback: (JsCode: string) => void) => void
+            addNewTab: (Callback: (Title: string) => void) => void
+            insertContentInElementId: (Callback: (targetId: string, html: string, css: string, js: string) => void) => void
         }
     }
 }

@@ -31,5 +31,17 @@ contextBridge.exposeInMainWorld("WebContent", {
 contextBridge.exposeInMainWorld("Plugins_", {
     initCss: (Callback: (CssCode: string) => void) => {
         ipcRenderer.on("Plugins: Css (init)", (event, CssCode) => Callback(CssCode));
-    }
+    },
+    initJs: (Callback: (JsCode: string) => void) => {
+        ipcRenderer.on("Plugins: Js (load)", (event, JsCode) => Callback(JsCode));
+    },
+    addNewTab: (Callback: (Title: string) => void) => {
+        ipcRenderer.on("Plugins: addNewTab (load)", (event, Title) => Callback(Title));
+    },
+    addNewContent: (Callback: (Tabtitle: string, html: string) => void) => {
+        ipcRenderer.on("Plugins: addNewContent (load)", (event, Tabtitle, html) => Callback(Tabtitle, html));
+    },
+    insertContentInElementId: (Callback: (targetId: string, html: string, css: string, js: string) => void) => {
+        ipcRenderer.on("Plugins: insertContent (load)", (event, targetId, html, css, js) => Callback(targetId, html, css, js));
+    },
 });

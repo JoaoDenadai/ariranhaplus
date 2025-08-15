@@ -1,7 +1,0 @@
-{
-    "name": "element",
-    "version": "1.0.0",
-    "author": "ariranhateam",
-    "package": "com.element.ariranha",
-    "main": "./src/Index.js"
-}

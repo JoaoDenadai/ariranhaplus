@@ -1,20 +1,3 @@
-
-class UI {
-    public static async Loading<T>(Function: () => Promise<T>) {
-        const Loader = document.getElementById("loader") as HTMLElement;
-        if (!Loader) return await Function();
-
-        void Loader.offsetWidth;
-        Loader.style.animation = "slide 1s ease-in-out infinite";
-
-        try {
-            return await Function();
-        } finally {
-            Loader.style.animation = "none";
-        }
-    }
-}
-
 class Tooltip {
     static showTooltip() {
         // Cria o tooltip uma única vez e adiciona ao body
@@ -76,27 +59,19 @@ class Tooltip {
         });
     }
 }
-Tooltip.showTooltip();
 
-window.WebContent.Log((msg, type) => {
-    switch (type) {
-        case "Error": {
-            console.error(msg);
-            break;
-        }
-        case "Message": {
-            console.log(msg);
-            break;
-        }
-        case "Warning": {
-            console.warn(msg);
-            break;
+class UI {
+    public static async Loading<T>(Function: () => Promise<T>) {
+        const Loader = document.getElementById("loader") as HTMLElement;
+        if (!Loader) return await Function();
+
+        void Loader.offsetWidth;
+        Loader.style.animation = "slide 1s ease-in-out infinite";
+
+        try {
+            return await Function();
+        } finally {
+            Loader.style.animation = "none";
         }
     }
-});
-
-window.Plugins_.initCss((Css: string) => {
-    const fromPlugin = document.createElement('style');
-    fromPlugin.textContent = Css;
-    document.head.appendChild(fromPlugin);
-});
+}

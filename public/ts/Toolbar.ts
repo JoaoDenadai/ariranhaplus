@@ -25,7 +25,7 @@ class Toolbar {
     }
 
     public getDatasetByToolbarElementId(element: HTMLElement) {
-        return element.id.split("module: ")[1];
+        return element.id.split("Ariranha_PluginModule_")[1];
     }
 
     public getToolbarElementIndex(element: HTMLElement) {
@@ -48,13 +48,22 @@ class Toolbar {
 
     public addElementsByStringArray(titles: string[]) {
         titles.forEach((elementTitle) => {
+            const divElement = this.Content_Container.querySelector(`div[data-screen="${elementTitle}"]`);
+
+            if (!divElement) {
+                const newContent = document.createElement("div");
+                newContent.dataset.screen = elementTitle;
+                this.Content_Container.appendChild(newContent);
+                newContent.id = "Ariranha_PluginContainer_" + elementTitle;
+            }
+
             const element = document.createElement("div");
             const text = document.createTextNode(elementTitle);
             const close = document.createElement("img");
-            close.src = "../public/assets/close.png";
+            close.src = "./assets/images/close.png";
 
             close.classList.add("close");
-            element.id = `module: ${elementTitle}`;
+            element.id = `Ariranha_PluginModule_${elementTitle}`;
             element.appendChild(text);
             element.appendChild(close);
             this.Toolbar_Container.appendChild(element);
@@ -69,7 +78,7 @@ class Toolbar {
         const newElement = document.createElement("div");
         const text = document.createTextNode(title);
         const close = document.createElement("img");
-        close.src = "../public/assets/close.png";
+        close.src = "./assets/images/close.png";
 
         close.classList.add("close");
         newElement.id = `module: ${title}`;
@@ -100,10 +109,10 @@ class Toolbar {
         next.style.backgroundColor = "white";
 
         (this.getElementsFromContents()).forEach((contentElement) => {
-            if (contentElement.dataset.screen !== next.id.split("module: ")[1]) {
+            if (contentElement.dataset.screen !== next.id.split("Ariranha_PluginModule_")[1]) {
                 contentElement.style.display = "none";
             } else {
-                contentElement.style.display = "flex";
+                contentElement.style.display = "";
             }
         });
     }
@@ -159,10 +168,10 @@ class Toolbar {
             element.style.backgroundColor = "white";
 
             ChildrensContent.forEach((contentElement) => {
-                if (contentElement.dataset.screen !== element.id.split("module: ")[1]) {
+                if (contentElement.dataset.screen !== element.id.split("Ariranha_PluginModule_")[1]) {
                     contentElement.style.display = "none";
                 } else {
-                    contentElement.style.display = "flex";
+                    contentElement.style.display = "";
                 }
             });
         });
@@ -270,6 +279,3 @@ class Toolbar {
     }
 }
 
-(function main() {
-    const mainToolbar = new Toolbar(DIV_Toolbar, DIV_Content);
-})();
