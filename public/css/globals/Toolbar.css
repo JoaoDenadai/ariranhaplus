@@ -10,7 +10,7 @@
 
 .TOOLBAR div{
     height: 100%;
-    width: 15vw;
+    width: 100px;
     display: flex;
 
     justify-content: space-around;
@@ -20,6 +20,7 @@
     background-color: #f1f3f4;
 
     font-size: 12px;
+    transition: 0.2s background-color ease-in;
 }
 
 .TOOLBAR div img{
@@ -39,8 +40,5 @@
 .TOOLBAR div:hover{
     background-color: #fbfbfb;
     cursor: pointer;
+    transition: 0.1s background-color ease-in-out;
 }
-
-#TOOLBAR > div.drag-over {
-    border: 2px dashed blue;
-  }

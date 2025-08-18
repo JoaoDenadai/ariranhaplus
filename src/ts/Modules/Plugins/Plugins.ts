@@ -1,8 +1,7 @@
 import * as cheerio from "cheerio";
-import { Filesystem, Path, Project } from "../../Libraries/Libraries";
-import { Log } from "../Core/Logs/Logs";
+import { Filesystem, Path, Project, System } from "../../Libraries/Libraries";
+import { Log, Web } from "../Core/Logs/Logs";
 import SysWindow from "../Core/Window/Window";
-import * as os from "os";
 
 
 // Define a interface da API que será exposta aos plugins
@@ -32,13 +31,13 @@ export interface PluginModule {
     init?: (api: __api__, html: __html__) => void;
 }
 
-export class PluginRuntime {
-    private static pluginsDir: string = Path.join(os.homedir(), "Ariranha Plus", "Plugins");
-    private static parentWindow: SysWindow;
+export class Extension {
+    private static DIR_ExtensionDirectory: string = Path.join(System.homedir(), "Ariranha Plus", "Plugins");
+    private static WIN_ExtensionWindow: SysWindow;
     private static api: __api__ = {
         getVersion() { return Project.version; },
         readFile(path: string) {
-            return Filesystem.readFileSync(Path.join(PluginRuntime.pluginsDir, path), "utf-8");
+            return Filesystem.readFileSync(Path.join(Extension.DIR_ExtensionDirectory, path), "utf-8");
         },
     };
 
@@ -47,56 +46,67 @@ export class PluginRuntime {
             return getHtml();
         },
         loadCssContent(Css: string): void {
-            PluginRuntime.parentWindow.webContents.send("Plugins: Css (init)", Css);
+            Extension.WIN_ExtensionWindow.webContents.send("Plugins: Css (init)", Css);
         },
         loadScriptContent(Js: string): void {
-            PluginRuntime.parentWindow.webContents.send("Plugins: Js (load)", Js);
+            Extension.WIN_ExtensionWindow.webContents.send("Plugins: Js (load)", Js);
         },
         addNewTab(Title: string): void {
-            PluginRuntime.parentWindow.webContents.send("Plugins: addNewTab (load)", Title);
+            Extension.WIN_ExtensionWindow.webContents.send("Plugins: addNewTab (load)", Title);
         },
         insertContentInElementId(Targetid, html, css, js) {
-            PluginRuntime.parentWindow.webContents.send("Plugins: insertContent (load)", Targetid, html, css, js);
+            Extension.WIN_ExtensionWindow.webContents.send("Plugins: insertContent (load)", Targetid, html, css, js);
         }
     };
 
-    public static load(parent: SysWindow) {
-        this.parentWindow = parent;
-        if (!Filesystem.existsSync(this.pluginsDir)) {
-            Filesystem.mkdirSync(this.pluginsDir, { recursive: true });
-            console.log("Diretório inexistente. Criando diretório: ", this.pluginsDir);
+    public static init(mWindow: SysWindow) {
+        this.WIN_ExtensionWindow = mWindow;
+
+        if (!Extension.WIN_ExtensionWindow) {
+            Log.New().Critical("Extension.init", "Não foi possível carregar a janela principal do plugin pois ela não foi definida.");
+        }
+
+        if (!Filesystem.existsSync(this.DIR_ExtensionDirectory)) {
+            try {
+                Filesystem.mkdirSync(this.DIR_ExtensionDirectory, { recursive: true });
+            } catch (error) {
+                new Web(mWindow).New().Error("Extension.init", "Não foi possível criar o diretório de extensões: " + error);
+            }
             return;
         };
 
-        const pluginFolders = Filesystem.readdirSync(this.pluginsDir);
+        const DIR_ExtensionsFolder = Filesystem.readdirSync(this.DIR_ExtensionDirectory);
 
-        for (const folder of pluginFolders) {
-            const pluginPath = Path.join(this.pluginsDir, folder);
+        DIR_ExtensionsFolder.forEach((pluginFolder) => {
+            const pluginPath = Path.join(this.DIR_ExtensionDirectory, pluginFolder);
             const manifestPath = Path.join(pluginPath, "manifest.json");
 
-            if (!Filesystem.existsSync(manifestPath)) continue;
+            if (!Filesystem.existsSync(manifestPath)) {
+                new Web(this.WIN_ExtensionWindow).New().Error("Extension.init", `Não foi possível carregar o arquivo "manifest.json" na extensão: ` + pluginFolder);
+                return;
+            };
 
             try {
-                const manifest: { name: string; main?: string } = JSON.parse(Filesystem.readFileSync(manifestPath, "utf-8"));
+                const Extension_ManifestFile: { name: string; main: string } = JSON.parse(Filesystem.readFileSync(manifestPath, "utf-8"));
+                const Extension_initFile = Path.join(pluginPath, Extension_ManifestFile.main || "main.js");
 
-                const mainFile = Path.join(pluginPath, manifest.main || "main.js");
+                if (Filesystem.existsSync(Extension_initFile)) {
+                    const Plugin: PluginModule = require(Extension_initFile);
 
-                if (Filesystem.existsSync(mainFile)) {
-                    const pluginModule: PluginModule = require(mainFile);
-
-                    if (pluginModule && typeof pluginModule.init === "function") {
+                    if (Plugin && typeof Plugin.init === "function") {
                         try {
-                            pluginModule.init(PluginRuntime.api, PluginRuntime.html);
-                            Log.New().Message("PluginRuntime.load", `Plugin carregado: ${manifest.name}`);
+                            Plugin.init(Extension.api, Extension.html);
+                            new Web(this.WIN_ExtensionWindow).New().Message("Extension.init", `Plugin carregado: ${Extension_ManifestFile.name}`);
                         } catch (error: unknown) {
-                            Log.New().Error("PluginRuntime.load", `O plugin foi carregado, porém, apresenta o seguinte erro: ${error}`);
+                            throw new Error(String(error));
                         }
-
                     }
+                } else {
+                    throw new Error(`File ${Extension_ManifestFile.main} could not be found in directory: ${DIR_ExtensionsFolder}`);
                 }
             } catch (error: unknown) {
-                Log.New().Error("PluginRuntime.load", `Erro ao carregar plugin: ${error}`);
+                new Web(this.WIN_ExtensionWindow).New().Error("Extension.init", `Erro ao carregar plugin: ${String(error)}`);
             }
-        }
+        });
     }
 }

@@ -11,6 +11,22 @@ declare global {
         Description: string,
     };
 
+    interface File_Settings_ariranha {
+        token: string,
+        username: string,
+        settings: {
+            general: {
+                locale: string,
+            }
+            plugins: {
+                loaded: string[],
+            }
+            developer: {
+                enabled: boolean
+            }
+        }
+    }
+
     type PopupTypes = "Message" | "Confirm" | "Warning" | "Error";
     type LogTypes = "Message" | "Warning" | "Error";
 
@@ -26,6 +42,7 @@ declare global {
             getClipboard: (callback: (text: string) => void) => void;
             sendClipboard: (content: string) => Promise<any>;
             setInteligentProcessor: (Enabled: boolean) => Promise<any>;
+            ReceiveSettingsData: (callback: (content: File_Settings_ariranha) => void) => void;
         };
         WebContent: {
             Log: (Callback: (Message: string, Type: LogTypes) => void) => void

@@ -1,12 +1,12 @@
-import { Filesystem, Instance, Path } from "../Libraries/Libraries";
+import { Filesystem, Instance, Path, System } from "../Libraries/Libraries";
 import SysWindow from "../Modules/Core/Window/Window";
 import { Log, Web } from "../Modules/Core/Logs/Logs";
 import Popup from "../Modules/Core/Popup/Popup";
 import Errno from "../Modules/Core/Errno/Errno";
 import Events from "./Main.Process";
-import { PluginRuntime, __api__, __html__ } from "../Modules/Plugins/Plugins";
-
+import { Extension } from "../Modules/Plugins/Plugins";
 import { Updater } from "../Modules/Updater/Updater";
+import { File } from "../Modules/Core/Files/Files";
 
 let mWindow: SysWindow | undefined;
 
@@ -28,13 +28,17 @@ function singleInstanceLock(): boolean {
   return true;
 }
 
-async function createMainWindow(): Promise<SysWindow | void> {
+async function createMainWindow(): Promise<void> {
   if (!Instance.isReady()) await Instance.whenReady();
 
   try {
     mWindow = new SysWindow({
-      width: 600,
-      height: 600,
+      width: 500,
+      height: 300,
+      //minHeight: 280,
+      //maxHeight: 320,
+      //minWidth: 475,
+      //maxWidth: 600,
       show: false,
       frame: false,
       webPreferences: {
@@ -56,7 +60,9 @@ async function createMainWindow(): Promise<SysWindow | void> {
   }
 
   try {
-    if (!mWindow) return;
+    if (!mWindow) {
+      throw new Error("Object mWindow is not defined.");
+    };
     Events(mWindow);
   } catch (error: unknown) {
     await Popup.New().Error("Erro ao registrar eventos da janela", Errno.onError(error), undefined, true);
@@ -77,10 +83,17 @@ async function createMainWindow(): Promise<SysWindow | void> {
     });
   });
 
-  mWindow.webContents.openDevTools();
-
-  return mWindow;
+  return;
 }
+
+function processInitArguments() {
+  const args = process.argv;
+
+  if (args.includes("--dev")) {
+    if (!mWindow) return;
+    mWindow.webContents.openDevTools();
+  };
+};
 
 (async function main() {
 
@@ -96,8 +109,27 @@ async function createMainWindow(): Promise<SysWindow | void> {
   await createMainWindow();
 
   Popup.Set().Parent(mWindow as SysWindow);
-  PluginRuntime.load(mWindow as SysWindow);
+  processInitArguments();
 
+  const base: File_Settings_ariranha = {
+    token: "none",
+    username: "beta",
+    settings: {
+      general: {
+        locale: "pt-BR",
+      },
+      plugins: {
+        loaded: [""],
+      },
+      developer: {
+        enabled: false,
+      }
+    }
+  };
+
+  const Config = new File<File_Settings_ariranha>(Path.join(System.homedir(), "Ariranha Plus", "Settings", "Settings.ariranha"), "base64", base);
+  mWindow?.webContents.send("Settings: data", Config.readFile());
+
+  Extension.init(mWindow as SysWindow);
   Updater.init(mWindow as SysWindow);
-  Updater.checkForUpdates();
 })();

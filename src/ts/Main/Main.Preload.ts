@@ -20,6 +20,9 @@ contextBridge.exposeInMainWorld("ariranha_", {
     setInteligentProcessor: async (Enabled: boolean) => {
         return await ipcRenderer.invoke('SmartFormat', Enabled);
     },
+    ReceiveSettingsData: (callback: (content: File_Settings_ariranha) => void) => {
+        ipcRenderer.on("Settings: data", (event, content) => callback(content));
+    },
 });
 
 contextBridge.exposeInMainWorld("WebContent", {

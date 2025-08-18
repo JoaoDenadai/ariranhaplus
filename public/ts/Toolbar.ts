@@ -68,30 +68,31 @@ class Toolbar {
             element.appendChild(close);
             this.Toolbar_Container.appendChild(element);
 
+            if (this.Toolbar_Elements.length === 0) {
+                element.style.backgroundColor = "white";
+            }
             this.Toolbar_Elements.push({ title: elementTitle, toolbarElement: element, contentElementDataset: elementTitle });
             this.addPoolEvents(element);
         });
     }
 
-    public addNewElement(contentDiv: HTMLElement, title: string) {
-        contentDiv.dataset.screen = title;
+    public addNewElement(element: HTMLElement, title: string): HTMLElement {
+        element.dataset.screen = title;
         const newElement = document.createElement("div");
         const text = document.createTextNode(title);
         const close = document.createElement("img");
         close.src = "./assets/images/close.png";
 
         close.classList.add("close");
-        newElement.id = `module: ${title}`;
+        newElement.id = `Ariranha_PluginModule_${title}`;
         newElement.appendChild(text);
         newElement.appendChild(close);
         this.Toolbar_Container.appendChild(newElement);
-        this.Content_Container.appendChild(contentDiv);
+        this.Content_Container.appendChild(element);
 
-        console.log("id: ", newElement.id);
-        console.log("dataset: ", contentDiv.dataset.screen);
-
-        this.Toolbar_Elements.push({ title: title, toolbarElement: newElement, contentElementDataset: contentDiv.dataset.screen });
+        this.Toolbar_Elements.push({ title: title, toolbarElement: newElement, contentElementDataset: element.dataset.screen });
         this.addPoolEvents(newElement);
+        return element;
     };
 
     public selectElementWhenRemoved(actualElement: HTMLElement) {
@@ -180,7 +181,6 @@ class Toolbar {
         element.addEventListener("mousedown", (event: MouseEvent) => {
             if ((event.target as HTMLElement).classList.contains("close")) return;
             let movimentEnabled: boolean = false;
-            const originalPosition = element.style.left;
 
             const cursorPositionX = event.clientX;
 
@@ -194,6 +194,7 @@ class Toolbar {
 
                 if (Math.abs(delta) > movimentCapToMove || movimentEnabled) {
                     let newLeft = getLeft + delta;
+                    element.style.transition = "";
                     element.style.left = `${newLeft}px`;
                     const WindowRect = element.getBoundingClientRect();
 
@@ -240,7 +241,11 @@ class Toolbar {
                     siblings[targetSiblingIndex].after(element);
                 }
 
-                element.style.left = "0px";
+                requestAnimationFrame(() => {
+                    element.style.transition = "left 0.3s ease-out";
+                    element.style.left = "0px";
+                });
+
                 element.style.zIndex = "";
                 movimentEnabled = false;
 

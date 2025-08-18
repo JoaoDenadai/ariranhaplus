@@ -1,3 +1,5 @@
+const Content = document.getElementById("CONTENT") as HTMLElement;
+
 const mainToolbar = new Toolbar(DIV_Toolbar, DIV_Content);
 
 
@@ -58,4 +60,15 @@ function initWindowResponseProcess() {
 
 document.addEventListener("DOMContentLoaded", () => {
     initWindowResponseProcess();
+
+    const childrens = Array.from(Content.children) as HTMLElement[];
+
+    childrens.forEach((el) => {
+        if (!el) return;
+        el.style.display = "none";
+    });
+
+    window.ariranha_.ReceiveSettingsData((data) => {
+        console.log(data.username);
+    });
 });
