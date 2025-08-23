@@ -1,44 +1,73 @@
 .TOOLBAR{
+    /* Display and aligment */
     display: flex;
     flex-direction: row;
 
-    background-color: #f1f3f4;
+    /* Positions */
 
+    /* Background and colors */
+    background-color: var(--darker-white-color);
+
+    /* Miscellaneous */
+
+    /* Dimensions and margins */
     height: 30px;
     width: 100vw;
+
+    /* Webkit */
+    -webkit-app-region: drag;
 }
 
 .TOOLBAR div{
-    height: 100%;
-    width: 100px;
+    /* Display and aligment */
     display: flex;
-
     justify-content: space-around;
     align-items: center;
+
+    /* Positions */
     position: relative;
 
-    background-color: #f1f3f4;
+    /* Background and colors */
+    background-color: var(--darker-white-color);
 
+    /* Miscellaneous */
     font-size: 12px;
     transition: 0.2s background-color ease-in;
+    
+    /* Dimensions and margins */
+    height: 100%;
+    width: 100px;
+    margin-left: 1px;
+
+    /* Webkit */
+    -webkit-app-region: no-drag;
 }
 
 .TOOLBAR div img{
+    /* Miscellaneous */
+    opacity: 50%;
+
+    /* Dimensions and margins */
     height: 10px;
     width: 10px;
-
-    opacity: 50%;
 }
 
 
+/* Transitions and states */
 .TOOLBAR div img:hover{
-    cursor: pointer;
+    /* Opacity */
     opacity: 85%;
+
+    /* Miscellaneous */
+    cursor: pointer;
 }
 
 
 .TOOLBAR div:hover{
-    background-color: #fbfbfb;
+    /* Background and colors */
+    background-color: var(--white-color);
+
+    /* Miscellaneous */
     cursor: pointer;
     transition: 0.1s background-color ease-in-out;
 }

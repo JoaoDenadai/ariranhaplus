@@ -1,9 +1,3 @@
-
-const DIV_Toolbar = document.getElementById("TOOLBAR") as HTMLDivElement;
-const DIV_Content = document.getElementById("CONTENT") as HTMLDivElement;
-let ChildrensToolbar: HTMLElement[];
-let ChildrensContent: HTMLElement[];
-
 interface ToolbarElements {
     title: string | undefined,
     toolbarElement: HTMLDivElement,
@@ -14,6 +8,9 @@ class Toolbar {
     public Toolbar_Elements: ToolbarElements[] = [];
     private Toolbar_Container: HTMLDivElement;
     private Content_Container: HTMLElement;
+    private ChildrensToolbar: HTMLElement[] = [];
+    private ChildrensContent: HTMLElement[] = [];
+    private ToolbarElement_id_base: string = "Ariranha_PluginModule_";
 
     constructor(toolbar: HTMLDivElement, content: HTMLDivElement) {
         this.Toolbar_Container = toolbar;
@@ -25,7 +22,7 @@ class Toolbar {
     }
 
     public getDatasetByToolbarElementId(element: HTMLElement) {
-        return element.id.split("Ariranha_PluginModule_")[1];
+        return element.id.split(this.ToolbarElement_id_base)[1];
     }
 
     public getToolbarElementIndex(element: HTMLElement) {
@@ -92,6 +89,7 @@ class Toolbar {
 
         this.Toolbar_Elements.push({ title: title, toolbarElement: newElement, contentElementDataset: element.dataset.screen });
         this.addPoolEvents(newElement);
+        element.click();
         return element;
     };
 
@@ -148,8 +146,8 @@ class Toolbar {
     }
 
     public addPoolEvents(element: HTMLElement) {
-        ChildrensToolbar = this.getElementsFromToolbar();
-        ChildrensContent = this.getElementsFromContents();
+        this.ChildrensToolbar = this.getElementsFromToolbar();
+        this.ChildrensContent = this.getElementsFromContents();
 
         const sort = () => this.sortToolbarElements();
 
@@ -161,15 +159,15 @@ class Toolbar {
 
         element.addEventListener("click", (event) => {
             if ((event.target as HTMLElement).className === "close") return;
-            ChildrensToolbar.forEach((toolbarElement) => {
+            this.ChildrensToolbar.forEach((toolbarElement) => {
                 if (!toolbarElement) return;
                 toolbarElement.style.backgroundColor = "";
             });
 
             element.style.backgroundColor = "white";
 
-            ChildrensContent.forEach((contentElement) => {
-                if (contentElement.dataset.screen !== element.id.split("Ariranha_PluginModule_")[1]) {
+            this.ChildrensContent.forEach((contentElement) => {
+                if (contentElement.dataset.screen !== element.id.split(this.ToolbarElement_id_base)[1]) {
                     contentElement.style.display = "none";
                 } else {
                     contentElement.style.display = "";

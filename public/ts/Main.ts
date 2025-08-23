@@ -1,7 +1,7 @@
-const Content = document.getElementById("CONTENT") as HTMLElement;
-
-const mainToolbar = new Toolbar(DIV_Toolbar, DIV_Content);
-
+const DIV_Toolbar = document.getElementById("TOOLBAR") as HTMLDivElement;
+const DIV_Content = document.getElementById("CONTENT") as HTMLDivElement;
+const toolbar_el = new Toolbar(DIV_Toolbar, DIV_Content);
+const tooltip_el = new Tooltip();
 
 function initWindowResponseProcess() {
     window.WebContent.Log((msg, type) => {
@@ -35,7 +35,7 @@ function initWindowResponseProcess() {
     });
 
     window.Plugins_.addNewTab((Title: string) => {
-        mainToolbar.addElementsByStringArray([Title]);
+        toolbar_el.addElementsByStringArray([Title]);
     });
 
     window.Plugins_.insertContentInElementId((targetId, html, css, js) => {
@@ -58,17 +58,54 @@ function initWindowResponseProcess() {
     });
 };
 
-document.addEventListener("DOMContentLoaded", () => {
-    initWindowResponseProcess();
-
+function initContent() {
+    const Content = document.getElementById("CONTENT") as HTMLElement;
     const childrens = Array.from(Content.children) as HTMLElement[];
 
-    childrens.forEach((el) => {
-        if (!el) return;
-        el.style.display = "none";
-    });
+    for (const elements of childrens) {
+        elements.style.display = "none";
+    }
+}
 
-    window.ariranha_.ReceiveSettingsData((data) => {
-        console.log(data.username);
-    });
+async function awaitLoading<T>(Function: () => Promise<T>) {
+    const Loader = document.getElementById("loader") as HTMLElement;
+    if (!Loader) return await Function();
+
+    void Loader.offsetWidth;
+    Loader.style.animation = "slide 1s ease-in-out infinite";
+
+    try {
+        return await Function();
+    } finally {
+        Loader.style.animation = "none";
+    }
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+    initWindowResponseProcess();
+    initContent();
+    initWindowEvents();
+
+    Thread.New(async () => {
+        const get = async () => {
+            try {
+                const response = await fetch("https://www.google.com/generate_204", { method: "GET", cache: "no-store", });
+                if (response.status === 204) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } catch (err) {
+                return false;
+            }
+        };
+        if (await get()) {
+            (document.getElementById("internet_connection") as HTMLImageElement).style.opacity = "0.75";
+            ((document.getElementById("internet_connection") as HTMLImageElement).parentElement as HTMLElement).dataset.tooltip = "title: Conectado a internet\nSua máquina está conectada à internet.\ndescription: Fornecido por Google";
+        } else {
+            (document.getElementById("internet_connection") as HTMLImageElement).style.opacity = "";
+            ((document.getElementById("internet_connection") as HTMLImageElement).parentElement as HTMLElement).dataset.tooltip = "title: Sem conexão com a internet\nSua máquina não está conectada à internet.\ndescription: Fornecido por Google";
+
+        }
+    }, 10000);
 });

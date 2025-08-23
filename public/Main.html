@@ -5,11 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./css/Titlebar.css">
     <link rel="stylesheet" href="./css/Loader.css">
-    <link rel="stylesheet" href="./css/Tooltip.css">
     <link rel="stylesheet" href="./css/Main.css">
+    <link rel="stylesheet" href="./css/Footer.css">
     <link rel="stylesheet" href="./css/globals/Toolbar.css">
-    <link rel="stylesheet" href="./ts/modules/Formatar/Formatar.css">
-    <link rel="stylesheet" href="./ts/modules/Settings/css/Settings.css">
 </head>
 <body>
     <div id="Window-titlebar">
@@ -18,7 +16,7 @@
             <label id="Window-titlebar-titlelabel">Ariranha Plus</label>
         </div>
         <div id="Window-titlebar-buttonsdiv">
-            <button id="Window-titlebar-buttons-settings"><img src="./assets/images/setting.png"></button>
+            <button data-tooltip="title: Configurações\nAcessa a tela de configurações do sistema." id="Window-titlebar-buttons-settings"><img src="./assets/images/setting.png"></button>
             <button id="Window-titlebar-buttons-minimize"><img src="./assets/images/minus.png"></button>
             <button id="Window-titlebar-buttons-close"><img src="./assets/images/close.png"></button>
         </div>
@@ -32,29 +30,18 @@
         <div class="TOOLBAR" id="TOOLBAR">
         </div>
         <div class="CONTENT" id="CONTENT">
-            <div id="SETTINGS">
-                <div id="SETTINGS_Select-type">
-                    <div data-settings="Geral"><img src="./assets/images/all.png">Geral</div>
-                    <div data-settings="Addons"><img src="./assets/images/addon.png">Addons</div>
-                    <div data-settings="Desenvolvedor"><img src="./assets/images/developer.png">Desenvolvedor</div>
-                </div>
-                <div id="SETTINGS_Content-Container">
-                    <div data-settings-screen="Geral">
-                        
-                    </div>
-                    <div data-settings-screen="Addons">Addons</div>
-                    <div data-settings-screen="Desenvolvedor">Desenvolvedor</div>
-                </div>
-            </div>
         </div>
     </main>
   
+    <footer>
+        <div data-tooltip="title: Sem conexão com a internet\nSua máquina não está conectada a internet.\ndescription: Provided by Google""><img id="internet_connection" src="./assets/images/footer/internet.png"></div>
+    </footer>
     
-    <script src="./js/Objects.js"></script>
-    <script src="./js/modules/Window/Titlebar.js"></script>
+    <script src="./js/Tooltip.js"></script>
+    <script src="./js/System/Window.js"></script>
     <script src="./js/Toolbar.js"></script>
+    <script src="./js/System/Threads.js"></script>
     <script src="./js/Main.js"></script>
-    <script src="./js/modules/Settings/Settings.js"></script>
 
 </body>
 </html>

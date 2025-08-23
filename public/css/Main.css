@@ -1,7 +1,64 @@
-body{
-    background-color: #f1f3f4;
+/* Globals */
+:root{
+    --white-color: #ffffff;
+    --darker-white-color: #f1f2f6;
+    --gray-color: #dfe4ea;
+    --darker-gray-color: #ced6e0;
+    --font-color: #3e3e3e;
+    --main-color: #1A73E8;
 }
 
+*{
+    user-select: none;
+    font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
+}
+
+*:focus{
+    outline: none;
+}
+
+body{
+    background-color: var(--white-color);
+
+    margin: 0px;
+    padding: 0px;
+
+    display: flex;
+    flex-direction: column;
+
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+/* Elements */
 #TOOLBAR{
-    border-bottom: 1px white solid;
+    border-bottom: 1px transparent solid;
+}
+
+
+#dynamic-tooltip {
+    /* Position */
+    position: absolute;
+    z-index: 100;
+    
+    /* Background and colors */
+    background: var(--white-color);
+    border: var(--gray-color) solid 1px;
+
+    /* Aligment */
+    padding: 6px 10px;
+    border-radius: 5px;
+
+    /* Events and transitions */
+    pointer-events: none;
+    white-space: normal;
+    transition: opacity 0.2s ease;
+
+    /* Miscellaneous */
+    opacity: 0;
+    font-size: 14px;
+    box-shadow: -1px 10px 19px -9px rgba(0,0,0,0.75);
+
+    /* Dimensions and margins */
+    max-width: 250px;
 }
