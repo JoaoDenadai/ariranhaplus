@@ -1,4 +1,3 @@
-
 type Generic_function<T> = () => T;
 
 type Thread_<T> = {
@@ -10,6 +9,7 @@ type Thread_<T> = {
 
 class Thread {
     public static threads: Thread_<unknown>[] = [];
+    public static running: number = 0;
     private static queue: number = 0;
 
     public static New<T>(fn: Generic_function<T>, delay: number): number {
@@ -19,11 +19,14 @@ class Thread {
             id: id,
             function: fn,
             interval: delay,
-            timer: setInterval(() => {
+            timer: setInterval(async () => {
                 try {
-                    fn();
+                    this.running++;
+                    await fn();
                 } catch (err) {
                     console.error(`Erro ao executar thread ${id}: `, err);
+                } finally {
+                    this.running--;
                 }
             }, delay),
         };

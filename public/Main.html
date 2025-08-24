@@ -34,7 +34,16 @@
     </main>
   
     <footer>
-        <div data-tooltip="title: Sem conexão com a internet\nSua máquina não está conectada a internet.\ndescription: Provided by Google""><img id="internet_connection" src="./assets/images/footer/internet.png"></div>
+        <div data-tooltip="title: Sem conexão com a internet\nSua máquina não está conectada a internet.\ndescription: Provided by Google">
+            <img id="internet_connection" src="./assets/images/footer/internet.png">
+        </div>
+        <div data-tooltip="title: Tarefas em segundo plano\nNúmero de tarefas do sistema em segundo plano.">
+            <img id="threads_process" src="./assets/images/footer/process.png">
+            <label id="thread_count"></label>
+        </div> 
+        <div data-tooltip="title: Memória\nConsumo de memória pelo sistema.">
+            <label id="memory_use"></label>
+        </div> 
     </footer>
     
     <script src="./js/Tooltip.js"></script>

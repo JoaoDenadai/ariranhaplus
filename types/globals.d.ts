@@ -43,6 +43,7 @@ declare global {
             sendClipboard: (content: string) => Promise<any>;
             setInteligentProcessor: (Enabled: boolean) => Promise<any>;
             ReceiveSettingsData: (callback: (content: File_Settings_ariranha) => void) => void;
+            getMemoryUsage: () => Promise<any>;
         };
         WebContent: {
             Log: (Callback: (Message: string, Type: LogTypes) => void) => void

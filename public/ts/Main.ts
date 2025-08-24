@@ -99,13 +99,24 @@ document.addEventListener("DOMContentLoaded", () => {
                 return false;
             }
         };
+
         if (await get()) {
             (document.getElementById("internet_connection") as HTMLImageElement).style.opacity = "0.75";
             ((document.getElementById("internet_connection") as HTMLImageElement).parentElement as HTMLElement).dataset.tooltip = "title: Conectado a internet\nSua máquina está conectada à internet.\ndescription: Fornecido por Google";
         } else {
             (document.getElementById("internet_connection") as HTMLImageElement).style.opacity = "";
             ((document.getElementById("internet_connection") as HTMLImageElement).parentElement as HTMLElement).dataset.tooltip = "title: Sem conexão com a internet\nSua máquina não está conectada à internet.\ndescription: Fornecido por Google";
-
         }
     }, 10000);
+
+    Thread.New(() => {
+        const num_threads = Thread.running;
+        (document.getElementById("threads_process") as HTMLImageElement).style.opacity = "1";
+        (document.getElementById("thread_count") as HTMLLabelElement).textContent = String(num_threads);
+    }, 500);
+
+    Thread.New(async () => {
+        const totalMb = await window.ariranha_.getMemoryUsage();
+        (document.getElementById("memory_use") as HTMLLabelElement).textContent = `${Math.round(totalMb).toString()} MB`;
+    }, 500);
 });

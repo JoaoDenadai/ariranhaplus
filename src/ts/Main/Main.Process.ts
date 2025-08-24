@@ -54,4 +54,9 @@ export default function Events(mWindow: SysWindow) {
         }
     });
 
+    ipcMain.handle("getMemoryUsage", async (event) => {
+        const info = await process.getProcessMemoryInfo() as { private?: number; shared?: number; residentSet?: number };
+        const totalMb = (info.residentSet ?? ((info.private ?? 0) + (info.shared ?? 0))) / 1024;
+        return totalMb.toFixed(2);
+    });
 }

@@ -23,6 +23,9 @@ contextBridge.exposeInMainWorld("ariranha_", {
     ReceiveSettingsData: (callback: (content: File_Settings_ariranha) => void) => {
         ipcRenderer.on("Settings: data", (event, content) => callback(content));
     },
+    getMemoryUsage: async () => {
+        return await ipcRenderer.invoke('getMemoryUsage');
+    },
 });
 
 contextBridge.exposeInMainWorld("WebContent", {
