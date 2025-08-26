@@ -5,17 +5,44 @@ interface ToolbarElements {
 }
 
 class Toolbar {
-    public Toolbar_Elements: ToolbarElements[] = [];
-    private Toolbar_Container: HTMLDivElement;
-    private Content_Container: HTMLElement;
-    private ChildrensToolbar: HTMLElement[] = [];
+    private Toolbar_Container: HTMLDivElement;          //Container da barra de abas
+    private Content_Container: HTMLElement;             //Container do conteúdo
+
+    public Toolbar_Elements: ToolbarElements[] = [];    //Elementos da barra de abas
+    private ChildrensToolbar: HTMLElement[] = [];       //Elementos filhos (Abas) da barra de abas
     private ChildrensContent: HTMLElement[] = [];
+
     private ToolbarElement_id_base: string = "Ariranha_PluginModule_";
 
+
+
+    /**
+     * Construtor que inicializa a instância da barra
+     * 
+     * @param {HTMLDivElement} toolbar
+     * Container pai dos elementos da barra de abas.
+     * 
+     * @param {HTMLDivElement} content
+     * Container pai dos elementos de conteúdo das abas.
+     * 
+     * @memberof Toolbar
+     */
     constructor(toolbar: HTMLDivElement, content: HTMLDivElement) {
         this.Toolbar_Container = toolbar;
         this.Content_Container = content;
-        (Array.from(toolbar.children) as HTMLElement[]).forEach((children) => {
+        
+
+        /**
+         * @param {HTMLElement[]} preload_toolbarElements
+         * Variável responsável por importar elementos já existentes no container da barra de abas.
+         * Caso já exista um elemento (Tipo uma aba) no momento da construção, ele importa a aba.
+         */
+        const preload_toolbarElements: HTMLElement[] = Array.from(toolbar.children) as HTMLElement[];
+        preload_toolbarElements.forEach((children) => {
+            /**
+             * @
+             * 
+             */
             this.Toolbar_Elements.push({ title: children.id ?? undefined, toolbarElement: children as HTMLDivElement, contentElementDataset: "Add" });
             this.addPoolEvents(children);
         });
@@ -51,7 +78,6 @@ class Toolbar {
                 const newContent = document.createElement("div");
                 newContent.dataset.screen = elementTitle;
                 this.Content_Container.appendChild(newContent);
-                newContent.id = "Ariranha_PluginContainer_" + elementTitle;
             }
 
             const element = document.createElement("div");
@@ -108,7 +134,7 @@ class Toolbar {
         next.style.backgroundColor = "white";
 
         (this.getElementsFromContents()).forEach((contentElement) => {
-            if (contentElement.dataset.screen !== next.id.split("Ariranha_PluginModule_")[1]) {
+            if (contentElement.dataset.screen !== next.id.split(this.ToolbarElement_id_base)[1]) {
                 contentElement.style.display = "none";
             } else {
                 contentElement.style.display = "";
