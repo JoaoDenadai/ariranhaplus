@@ -119,4 +119,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const totalMb = await window.ariranha_.getMemoryUsage();
         (document.getElementById("memory_use") as HTMLLabelElement).textContent = `${Math.round(totalMb).toString()} MB`;
     }, 500);
+
+    toolbar_el.addElementsByStringArray(["El", "El"]);
 });
