@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="./css/Loader.css">
     <link rel="stylesheet" href="./css/Main.css">
     <link rel="stylesheet" href="./css/Footer.css">
+    <link rel="stylesheet" href="./css/Settings.css">
     <link rel="stylesheet" href="./css/globals/Toolbar.css">
 </head>
 <body>
@@ -32,6 +33,23 @@
         <div class="CONTENT" id="CONTENT">
         </div>
     </main>
+
+    <div id="SETTINGS">
+        <div id="Settings-sidebar">
+            <div id="Settings-sidebar-division-top">
+                <div id="Settings-user">
+                    <img src="./assets/images/account.png" id="Settings-user-profile">
+                </div>
+                <input type="text" id="Settings-search" placeholder="Digite para pesquisar...">
+            </div>
+            <div id="Settings-divisions">
+                <div><img src="./assets/images/all.png">Geral</div>
+                <div><img src="./assets/images/brush.png">Personalização</div>
+                <div><img src="./assets/images/addon.png">Plugins</div>
+            </div>
+        </div>
+        <div id="SETTINGS-CONTENT"></div>
+    </div>
   
     <footer>
         <div data-tooltip="title: Sem conexão com a internet\nSua máquina não está conectada a internet.\ndescription: Provided by Google">
@@ -45,8 +63,9 @@
             <label id="memory_use"></label>
         </div> 
     </footer>
-    
+
     <script src="./js/Tooltip.js"></script>
+    <script src="./js/System/Settings.js"></script>
     <script src="./js/System/Window.js"></script>
     <script src="./js/Toolbar.js"></script>
     <script src="./js/System/Threads.js"></script>

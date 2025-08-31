@@ -32,15 +32,15 @@ export interface PluginModule {
 }
 
 export class Extension {
-    private static DIR_ExtensionDirectory: string = Path.join(System.homedir(), "Ariranha Plus", "Plugins");
+    private static DIR_ExtensionDirectory: string = Path.join(System.homedir(), "Ariranha", "Plugins");
     private static WIN_ExtensionWindow: SysWindow;
+    private static ExtensionsLoaded: string[];
     private static api: __api__ = {
         getVersion() { return Project.version; },
         readFile(path: string) {
             return Filesystem.readFileSync(Path.join(Extension.DIR_ExtensionDirectory, path), "utf-8");
         },
     };
-
     private static html: __html__ = {
         getMainContent(): string {
             return getHtml();
@@ -69,10 +69,11 @@ export class Extension {
         if (!Filesystem.existsSync(this.DIR_ExtensionDirectory)) {
             try {
                 Filesystem.mkdirSync(this.DIR_ExtensionDirectory, { recursive: true });
+                return;
             } catch (error) {
                 new Web(mWindow).New().Error("Extension.init", "Não foi possível criar o diretório de extensões: " + error);
+                return;
             }
-            return;
         };
 
         const DIR_ExtensionsFolder = Filesystem.readdirSync(this.DIR_ExtensionDirectory);
@@ -92,6 +93,7 @@ export class Extension {
 
                 if (Filesystem.existsSync(Extension_initFile)) {
                     const Plugin: PluginModule = require(Extension_initFile);
+                    this.ExtensionsLoaded.push(Extension_ManifestFile.name);
 
                     if (Plugin && typeof Plugin.init === "function") {
                         try {

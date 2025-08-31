@@ -127,8 +127,14 @@ function processInitArguments() {
     }
   };
 
-  const Config = new File<File_Settings_ariranha>(Path.join(System.homedir(), "Ariranha Plus", "Settings", "Settings.ariranha"), "base64", base);
-  mWindow?.webContents.send("Settings: data", Config.readFile());
+  const Config = new File<File_Settings_ariranha>(Path.join(System.homedir(), "Ariranha", "Settings", "Settings.ariranha"), "base64", base);
+  if (!Config.verifyIfFileExists()) {
+    Config.createFile(base);
+    if (mWindow) mWindow.webContents.send("Settings: data", base);
+  } else {
+    const fileData = Config.readFile();
+    if (mWindow) mWindow.webContents.send("Settings: data", fileData);
+  }
 
   Extension.init(mWindow as SysWindow);
   Updater.init(mWindow as SysWindow);

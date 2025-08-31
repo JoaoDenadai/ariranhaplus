@@ -1,0 +1,95 @@
+#SETTINGS{
+    width: 100vw;
+    height: calc(100vh - 37px);
+
+    background-color: var(--darker-white-color);
+}
+
+#Settings-sidebar{
+    width: 250px;
+    height: 100%;
+
+    background-color: var(--darker-white-color);
+
+    display: flex;
+    flex-direction: column;
+
+}
+
+#Settings-divisions{
+    width: 100%;
+
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+
+    align-items: center;
+}
+
+#Settings-divisions div{
+    width: 87%;
+    height: 30px;
+
+    background-color: var(--darker-white-color);
+
+    display: flex;
+    align-items: center;
+    justify-content: left;
+
+    border-radius: 5px;
+
+    gap: 5px;
+
+    font-size: 13px;
+}
+
+#Settings-divisions div img{
+    width: 15px;
+    height: 15px;
+    margin-left: 10px;
+}
+
+#Settings-divisions div:hover{
+    background-color: var(--white-color);
+    cursor: pointer;
+}
+
+#Settings-sidebar-division-top{
+    height: 80px;
+    width: 100%;
+
+    background-color: var(--darker-white-color);
+
+    display: flex;
+    flex-direction: column;
+
+    justify-content: left;
+    align-items: center;
+}
+
+#Settings-user{
+    display: flex;
+    flex-direction: row;
+
+    align-items: center;
+    justify-content: space-around;
+
+    width: 100%;
+    height: 50px;
+}
+
+#Settings-user img{
+    width: 25px;
+    height: 25px;
+}
+
+#Settings-search{
+    display: flex;
+
+    width: 85%;
+    height: 25px;
+
+    border-radius: 5px;
+    border: none;
+    border-bottom: solid #e1e1e1 1px;
+}

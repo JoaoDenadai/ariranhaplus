@@ -9,7 +9,8 @@
     "build:renderer": "tsc -p public/tsconfig.renderer.json",
     "compile": "npm run build:main && npm run build:renderer",
     "exec": "electron .",
-    "fast": "eslint . && npm run compile && electron . --dev",
+    "fast": "eslint . && npm run compile && electron .",
+    "fast--dev": "eslint . && npm run compile && electron . --dev",
     "build": "eslint . && npm run compile && electron-builder"
   },
   "keywords": [],

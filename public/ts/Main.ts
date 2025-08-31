@@ -58,15 +58,6 @@ function initWindowResponseProcess() {
     });
 };
 
-function initContent() {
-    const Content = document.getElementById("CONTENT") as HTMLElement;
-    const childrens = Array.from(Content.children) as HTMLElement[];
-
-    for (const elements of childrens) {
-        elements.style.display = "none";
-    }
-}
-
 async function awaitLoading<T>(Function: () => Promise<T>) {
     const Loader = document.getElementById("loader") as HTMLElement;
     if (!Loader) return await Function();
@@ -83,8 +74,8 @@ async function awaitLoading<T>(Function: () => Promise<T>) {
 
 document.addEventListener("DOMContentLoaded", () => {
     initWindowResponseProcess();
-    initContent();
     initWindowEvents();
+    toolbar_el.addPoolEventsFunction(dragAndDropPoolevent);
 
     Thread.New(async () => {
         const get = async () => {
@@ -120,5 +111,10 @@ document.addEventListener("DOMContentLoaded", () => {
         (document.getElementById("memory_use") as HTMLLabelElement).textContent = `${Math.round(totalMb).toString()} MB`;
     }, 500);
 
-    toolbar_el.addElementsByStringArray(["El", "El"]);
+    toolbar_el.addElementsByStringArray(["Teste1", "Teste2", "Teste3"]);
+    toolbar_el.addPoolEventsInAllElements();
+    console.log(toolbar_el.Toolbar_Elements);
+
+    (document.getElementById("SETTINGS") as HTMLElement).style.display = "none";
+    loadConfig();
 });

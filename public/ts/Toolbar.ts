@@ -1,7 +1,8 @@
 interface ToolbarElements {
     title: string | undefined,
     toolbarElement: HTMLDivElement,
-    contentElementDataset: string
+    contentElementDataset: string,
+    poolEvents?: ((...args: any) => any)[] | undefined,
 }
 
 class Toolbar {
@@ -9,10 +10,12 @@ class Toolbar {
     private Content_Container: HTMLElement;             //Container do conteúdo
 
     public Toolbar_Elements: ToolbarElements[] = [];    //Elementos da barra de abas
-    private ChildrensToolbar: HTMLElement[] = [];       //Elementos filhos (Abas) da barra de abas
-    private ChildrensContent: HTMLElement[] = [];
+    public ChildrensToolbar: HTMLElement[] = [];       //Elementos filhos (Abas) da barra de abas
+    public ChildrensContent: HTMLElement[] = [];
 
-    private ToolbarElement_id_base: string = "Ariranha_PluginModule_";
+    public ToolbarElement_id_base: string = "Ariranha_PluginModule_";
+    public ContentElement_id_base: string = "Ariranha_PluginContainer_";
+    public PoolEvents: ((element: HTMLElement, toolbar?: Toolbar, ...args: any) => any)[] = [];
 
     /**
      * Construtor que inicializa a instância da barra
@@ -25,7 +28,7 @@ class Toolbar {
      * 
      * @memberof Toolbar
      */
-    constructor(toolbar: HTMLDivElement, content: HTMLDivElement) {
+    constructor(toolbar: HTMLDivElement, content: HTMLDivElement, poolEventsFunction?: ((element: HTMLElement, toolbar?: Toolbar, ...args: any) => any)) {
         this.Toolbar_Container = toolbar;
         this.Content_Container = content;
 
@@ -37,16 +40,17 @@ class Toolbar {
          */
         const preload_toolbarElements: HTMLElement[] = Array.from(toolbar.children) as HTMLElement[];
         preload_toolbarElements.forEach((children) => {
-            /**
-             *  Aplica um push ao elemnto @this.Toolbar_Elements, incluindo os elementos já existentes na variável.
-             */
-            this.Toolbar_Elements.push({ title: children.id ?? undefined, toolbarElement: children as HTMLDivElement, contentElementDataset: "Add" });
+            const events: ((el: HTMLElement, toolbar?: Toolbar, ...args: any) => any)[] = [];
 
+            if (poolEventsFunction) {
+                poolEventsFunction(children, this);
+                events.push(poolEventsFunction);
+            }
             /**
-             * Não adicionar mais os comportamentos de cada elemento via construtor
-             * @deprecated
+             *  Aplica um push ao elemnto this.Toolbar_Elements, incluindo os elementos já existentes na variável.
              */
-            this.addPoolEvents(children);
+            this.Toolbar_Elements.push({ title: children.textContent ?? children.id ?? undefined, toolbarElement: children as HTMLDivElement, contentElementDataset: `${this.ContentElement_id_base}${children.id ?? undefined}`, poolEvents: events });
+
         });
     }
 
@@ -96,10 +100,18 @@ class Toolbar {
         return this.Toolbar_Elements as [];
     }
 
+    /**
+     * Função que seleciona a aba apenas ao ser chamada. É necessário passar o título da aba.
+     * @param {string} title
+     * Título da aba a ser selecionada
+     * @memberof Toolbar
+     */
     public selectElementByTitle(title: string): void {
+        // Percorre todos os elementos da barra de abas
         this.Toolbar_Elements.forEach((el) => {
-            console.log(`el: ${el}; title: ${title}`);
+            // Se o título do elemento da barra de abas foi igual ao título passado como parâmetro...
             if (el.title === title) {
+                // Pinta o fundo da aba de branco e apresenta o conteúdo da aba.
                 el.toolbarElement.style.backgroundColor = "white";
                 (document.querySelector(`[data-screen="${el.contentElementDataset}"]`) as HTMLElement).style.display = "";
             } else {
@@ -117,22 +129,24 @@ class Toolbar {
     public addElementsByStringArray(titles: string[]) {
         // Para cada título...
         titles.forEach((elementTitle) => {
-            let uniqueTitle = elementTitle;
-            let counter = 1;
+            let title = elementTitle;
 
-            while (this.Toolbar_Elements.some(el => el.title === uniqueTitle)) {
-                uniqueTitle = `${elementTitle}_${counter}`;
-                counter++;
+            let i = 1;
+            while (this.Toolbar_Elements.some(el => el.title === title)) {
+                title = `${elementTitle}_${i}`;
+                i++;
             }
 
             //...tenta importar o elemento de conteúdo...
-            const divElement = this.Content_Container.querySelector(`div[data-screen="${uniqueTitle}"]`);
+            const divElement = this.Content_Container.querySelector(`div[data-screen="${title}"]`);
 
             // Verifica se o elemento de conteúdo existe, senão...
             if (!divElement) {
                 // Cria um novo elemento de conteúdo, altera seu dataset-screen para o título passado...
                 const newContent = document.createElement("div");
-                newContent.dataset.screen = uniqueTitle;
+                newContent.dataset.screen = title;
+                newContent.id = `${this.ContentElement_id_base}${title}`;
+                newContent.style.display = "none";
 
                 //... e vincula o conteúdo no container de conteúdos.
                 this.Content_Container.appendChild(newContent);
@@ -141,14 +155,14 @@ class Toolbar {
             // Cria uma nova aba...
             const newTab = document.createElement("div");
             // ...inclui o título...
-            const text = document.createTextNode(uniqueTitle);
+            const text = document.createTextNode(title);
             // ...adiciona o botão de fechar e passa o Path da imagem...
             const close = document.createElement("img");
             close.src = "./assets/images/close.png";
             close.classList.add("close");
 
             // Adiciona um novo Id ao elemento da aba.
-            newTab.id = `Ariranha_PluginModule_${uniqueTitle}`;
+            newTab.id = `Ariranha_PluginModule_${title}`;
             // Adiciona o título e a imagem de fechar aba.
             newTab.appendChild(text);
             newTab.appendChild(close);
@@ -157,50 +171,109 @@ class Toolbar {
             this.Toolbar_Container.appendChild(newTab);
 
             // Inclui a aba na lista de abas.
-            this.Toolbar_Elements.push({ title: uniqueTitle, toolbarElement: newTab, contentElementDataset: uniqueTitle });
+            this.Toolbar_Elements.push({ title: title, toolbarElement: newTab, contentElementDataset: title, poolEvents: [] });
+            const added = this.Toolbar_Elements[this.Toolbar_Elements.length - 1].toolbarElement;
+
+            this.PoolEvents.forEach(event => event(added, this));
+
 
             // Se for o primeiro elemento adicionado, pinta seu fundo de branco.
             if (this.Toolbar_Elements.length === 1) {
-                this.selectElementByTitle(uniqueTitle);
+                this.selectElementByTitle(title);
             }
-
-            // Adiciona os eventos do botão.
-            this.addPoolEvents(newTab);
         });
     }
 
-    public addNewElement(element: HTMLElement, title: string): HTMLElement {
-        element.dataset.screen = title;
+    /**
+     * Função que adiciona uma nova aba a partir de um elemento de conteúdo.
+     *
+     * @param {HTMLElement} element
+     * Elemento de conteúdo.
+     * 
+     * @param {string} title
+     * Título da aba.
+     * 
+     * @memberof Toolbar
+     */
+    public addNewToolbarElementByContentElement(element: HTMLElement, title: string): void {
+        // Passa o título da aba para uma variável local.
+        // Permite manipular o título.
+        let uniqueTitle = title;
+
+        // Repetição que verifica se a aba já existe.
+        // Caso exista, ele irá automaticamente corrigir o título, adicionando um indice na frente do título.
+        let i = 1;
+        while (this.Toolbar_Elements.some(e => e.title === uniqueTitle)) {
+            uniqueTitle = `${title}_${i}`;
+            i++;
+        }
+
+        // Define parâmetros básicos do elemento de conteúdo. 
+        element.dataset.screen = uniqueTitle;
+        element.style.display = "none";
+        element.id = `${this.ContentElement_id_base}${uniqueTitle}`;
+
+        // Elemento da aba.
         const newElement = document.createElement("div");
-        const text = document.createTextNode(title);
+        newElement.id = `Ariranha_PluginModule_${uniqueTitle}`;
+
+        // Adiciona o título da aba.
+        const text = document.createTextNode(uniqueTitle);
+
+        // Imagem do botão de fechar aba.
         const close = document.createElement("img");
         close.src = "./assets/images/close.png";
-
         close.classList.add("close");
-        newElement.id = `Ariranha_PluginModule_${title}`;
+
+        // Vincula o título e o botão de fechar aba na própria aba.
         newElement.appendChild(text);
         newElement.appendChild(close);
+
+        // Vincula a aba e o conteúdo.
         this.Toolbar_Container.appendChild(newElement);
         this.Content_Container.appendChild(element);
 
-        this.Toolbar_Elements.push({ title: title, toolbarElement: newElement, contentElementDataset: element.dataset.screen });
-        this.addPoolEvents(newElement);
-        element.click();
-        return element;
+        // Adiciona a aba na lista de abas gerenciada pela classe.
+        this.Toolbar_Elements.push({ title: uniqueTitle, toolbarElement: newElement, contentElementDataset: element.dataset.screen, poolEvents: [] });
+        const added = this.Toolbar_Elements[this.Toolbar_Elements.length - 1].toolbarElement;
+
+        this.PoolEvents.forEach(event => event(added, this));
+
+        // Caso seja a primeira aba, seleciona a aba.
+        if (this.Toolbar_Elements.length === 1) {
+            this.selectElementByTitle(uniqueTitle);
+        }
     };
 
-    public selectElementWhenRemoved(actualElement: HTMLElement) {
-        let index = this.Toolbar_Elements.findIndex((item) => item.toolbarElement === actualElement);
-        if (index === -1 || this.Toolbar_Elements.length <= 1) {
-            index = 0;
-        };
+    public getSelectedElementTitle() {
+        const selected: ToolbarElements | undefined = this.Toolbar_Elements.find(el => el.toolbarElement.style.backgroundColor === "white");
+        if (!selected) {
+            return;
+        } else {
+            return selected.title;
+        }
+    }
+
+    /**
+     * Função que seleciona o primeiro elemento da barra de abas após o selecionado ser removido.
+     *
+     * @memberof Toolbar
+     */
+    public selectFirstElementWhenRemoved() {
+        if (this.Toolbar_Elements.length < 1) {
+            return;
+        }
+
+        if (this.getSelectedElementTitle()) {
+            return;
+        }
 
         (this.getElementsFromToolbar()).forEach((toolbarElement) => {
             if (!toolbarElement) return;
             toolbarElement.style.backgroundColor = "";
         });
 
-        const next = this.Toolbar_Elements[index].toolbarElement;
+        const next = this.Toolbar_Elements[0].toolbarElement;
         next.style.backgroundColor = "white";
 
         (this.getElementsFromContents()).forEach((contentElement) => {
@@ -223,7 +296,6 @@ class Toolbar {
     public removeByTitle(Title: string) {
         const index = this.Toolbar_Elements.findIndex((item) => item.title === Title);
         const childrens = this.getScreenElementByToolbarElement(this.Toolbar_Elements[index].toolbarElement);
-        console.log(childrens);
         childrens.forEach((el) => {
             el.remove();
         });
@@ -241,140 +313,132 @@ class Toolbar {
         this.Toolbar_Elements.splice(index, 1);
     }
 
-    public addPoolEvents(element: HTMLElement) {
-        this.ChildrensToolbar = this.getElementsFromToolbar();
-        this.ChildrensContent = this.getElementsFromContents();
+    public addPoolEventsFunction(poolFunction: (...args: any[]) => any) {
+        this.PoolEvents.push(poolFunction);
+    }
 
-        const sort = () => this.sortToolbarElements();
-
-        element.querySelector(".close")?.addEventListener("click", (event) => {
-            this.removeByTitle(this.getDatasetByToolbarElementId(element));
-            this.selectElementWhenRemoved(element);
-            sort();
-        });
-
-        element.addEventListener("click", (event) => {
-            if ((event.target as HTMLElement).className === "close") return;
-            this.ChildrensToolbar.forEach((toolbarElement) => {
-                if (!toolbarElement) return;
-                toolbarElement.style.backgroundColor = "";
-            });
-
-            element.style.backgroundColor = "white";
-
-            this.ChildrensContent.forEach((contentElement) => {
-                if (contentElement.dataset.screen !== element.id.split(this.ToolbarElement_id_base)[1]) {
-                    contentElement.style.display = "none";
-                } else {
-                    contentElement.style.display = "";
+    public addPoolEventsInAllElements() {
+        this.Toolbar_Elements.forEach((el) => {
+            const element = el;
+            this.PoolEvents.forEach((events) => {
+                if (!el.poolEvents?.includes(events)) {
+                    console.log(element.poolEvents);
+                    events(element.toolbarElement, this);
+                    element.poolEvents?.push(events);
                 }
             });
         });
-
-
-        element.addEventListener("mousedown", (event: MouseEvent) => {
-            if ((event.target as HTMLElement).classList.contains("close")) return;
-            let movimentEnabled: boolean = false;
-
-            const cursorPositionX = event.clientX;
-
-            const getLeft = parseInt(element.style.left) || 0;
-
-            element.click();
-
-            function onMouseMove(onMouseMoveEvent: MouseEvent) {
-                const movimentCapToMove = 20;
-                const delta = onMouseMoveEvent.clientX - cursorPositionX;
-
-                if (Math.abs(delta) > movimentCapToMove || movimentEnabled) {
-                    let newLeft = getLeft + delta;
-                    element.style.transition = "";
-                    element.style.left = `${newLeft}px`;
-                    const WindowRect = element.getBoundingClientRect();
-
-                    if (WindowRect.left < 0) {
-                        newLeft = newLeft - WindowRect.left;
-                        element.style.left = `${newLeft}px`;
-                        movimentEnabled = false;
-                    } else {
-                        movimentEnabled = true;
-                    }
-                    element.style.zIndex = "2";
-                }
-            }
-
-            function onMouseUp(onMouseUpEvent: MouseEvent) {
-                document.removeEventListener("mousemove", onMouseMove);
-                document.removeEventListener("mouseup", onMouseUp);
-
-                const siblingsAndElement = Array.from(element.parentElement!.children) as HTMLElement[];
-
-                const elementRect = element.getBoundingClientRect();
-                const elementCenter = elementRect.left + elementRect.width / 2;
-
-                const siblings = siblingsAndElement.filter(sib => sib !== element);
-
-                let targetSiblingIndex = -1;
-                for (let i = 0; i < siblings.length; i++) {
-                    const actualSibling = siblings[i] as HTMLElement;
-                    if (actualSibling.dataset.property?.includes(("Fixed").toLowerCase())) {
-                        break;
-                    };
-                    const actualSiblingRect = siblings[i].getBoundingClientRect();
-                    const actualSiblingCenter = actualSiblingRect.left + actualSiblingRect.width / 2;
-
-                    if (elementCenter > actualSiblingCenter) {
-                        targetSiblingIndex = i;
-                    } else {
-                        break;
-                    }
-                }
-                if (targetSiblingIndex === -1) {
-                    element.parentElement!.prepend(element);
-                } else {
-                    siblings[targetSiblingIndex].after(element);
-                }
-
-                requestAnimationFrame(() => {
-                    element.style.transition = "left 0.3s ease-out";
-                    element.style.left = "0px";
-                });
-
-                element.style.zIndex = "";
-                movimentEnabled = false;
-
-                sort();
-            }
-
-            document.addEventListener("mousemove", onMouseMove);
-            document.addEventListener("mouseup", onMouseUp);
-        });
-    }
-
-    public addCustomPoolEventsCallback(element: HTMLElement, PoolFunction: (el: HTMLElement) => void) {
-
-        const replace = element.cloneNode(true);
-
-        const index = this.Toolbar_Elements.findIndex(item => item.toolbarElement === element);
-        if (index !== -1) {
-            this.Toolbar_Elements[index].toolbarElement = replace as HTMLDivElement;
-        }
-
-        console.log(element);
-        element.parentNode?.replaceChild(replace, element);
-        console.log(replace);
-        PoolFunction(replace as HTMLElement);
-    }
-
-    public addCustomPoolEventsCallbackByTitle(title: string, PoolFunction: (el: HTMLElement) => void) {
-        const index = this.Toolbar_Elements.findIndex((item) => item.title === title);
-        if (index === -1) return;
-
-        const getContent = this.Toolbar_Elements[index].toolbarElement;
-        const replace = this.Toolbar_Elements[index].toolbarElement.cloneNode(true);
-        this.Toolbar_Elements[index].toolbarElement = replace as HTMLDivElement;
-        this.Toolbar_Container.replaceChild(replace, getContent);
-        PoolFunction(replace as HTMLElement);
     }
 }
 
+function dragAndDropPoolevent(element: HTMLElement, toolbar: Toolbar) {
+    toolbar.ChildrensToolbar = toolbar.getElementsFromToolbar();
+    toolbar.ChildrensContent = toolbar.getElementsFromContents();
+
+    const sort = () => toolbar.sortToolbarElements();
+
+    element.querySelector(".close")?.addEventListener("click", (event) => {
+        toolbar.removeByTitle(toolbar.getDatasetByToolbarElementId(element));
+        toolbar.selectFirstElementWhenRemoved();
+        sort();
+    });
+
+    element.addEventListener("click", (event) => {
+        if ((event.target as HTMLElement).className === "close") return;
+        toolbar.ChildrensToolbar.forEach((toolbarElement: any) => {
+            if (!toolbarElement) return;
+            toolbarElement.style.backgroundColor = "";
+        });
+
+        element.style.backgroundColor = "white";
+
+        toolbar.ChildrensContent.forEach((contentElement: any) => {
+            if (contentElement.dataset.screen !== element.id.split(toolbar.ToolbarElement_id_base)[1]) {
+                contentElement.style.display = "none";
+            } else {
+                contentElement.style.display = "";
+            }
+        });
+    });
+
+
+    element.addEventListener("mousedown", (event: MouseEvent) => {
+        if ((event.target as HTMLElement).classList.contains("close")) return;
+        let movimentEnabled: boolean = false;
+
+        const cursorPositionX = event.clientX;
+
+        const getLeft = parseInt(element.style.left) || 0;
+
+        element.click();
+
+        function onMouseMove(onMouseMoveEvent: MouseEvent) {
+            const movimentCapToMove = 20;
+            const delta = onMouseMoveEvent.clientX - cursorPositionX;
+
+            if (Math.abs(delta) > movimentCapToMove || movimentEnabled) {
+                let newLeft = getLeft + delta;
+                element.style.transition = "";
+                element.style.left = `${newLeft}px`;
+                const WindowRect = element.getBoundingClientRect();
+
+                if (WindowRect.left < 0) {
+                    newLeft = newLeft - WindowRect.left;
+                    element.style.left = `${newLeft}px`;
+                    movimentEnabled = false;
+                } else {
+                    movimentEnabled = true;
+                }
+                element.style.zIndex = "2";
+            }
+        }
+
+        function onMouseUp(onMouseUpEvent: MouseEvent) {
+            document.removeEventListener("mousemove", onMouseMove);
+            document.removeEventListener("mouseup", onMouseUp);
+
+            const siblingsAndElement = Array.from(element.parentElement!.children) as HTMLElement[];
+
+            const elementRect = element.getBoundingClientRect();
+            const elementCenter = elementRect.left + elementRect.width / 2;
+
+            const siblings = siblingsAndElement.filter(sib => sib !== element);
+
+            let targetSiblingIndex = -1;
+            for (let i = 0; i < siblings.length; i++) {
+                const actualSibling = siblings[i] as HTMLElement;
+                if (actualSibling.dataset.property?.includes(("Fixed").toLowerCase())) {
+                    break;
+                };
+                const actualSiblingRect = siblings[i].getBoundingClientRect();
+                const actualSiblingCenter = actualSiblingRect.left + actualSiblingRect.width / 2;
+
+                if (elementCenter > actualSiblingCenter) {
+                    targetSiblingIndex = i;
+                } else {
+                    break;
+                }
+            }
+            if (targetSiblingIndex === -1) {
+                element.parentElement!.prepend(element);
+            } else {
+                siblings[targetSiblingIndex].after(element);
+            }
+
+            /*
+            requestAnimationFrame(() => {
+                element.style.transition = "left 1s ease-out";
+                element.style.left = "0px";
+            });
+            */
+
+            element.style.zIndex = "";
+            movimentEnabled = false;
+
+            sort();
+        }
+
+        document.addEventListener("mousemove", onMouseMove);
+        document.addEventListener("mouseup", onMouseUp);
+    });
+}

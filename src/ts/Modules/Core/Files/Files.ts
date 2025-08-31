@@ -26,9 +26,10 @@ export class File<T> {
         return Filesystem.existsSync(this.Path);
     }
     public createFile(Content: T = this.Default) {
+        Log.New().Message("File.createFile", "Criando arquivo.");
         try {
             if (this.verifyIfFileExists()) {
-                Log.New().Message(`Settings.createFile`, `O arquivo já existe no diretório especificado.`);
+                Log.New().Message(`File.createFile`, `O arquivo já existe no diretório especificado.`);
                 return;
             }
             Filesystem.mkdirSync(Path.dirname(this.Path), { recursive: true });

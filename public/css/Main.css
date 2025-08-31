@@ -6,6 +6,7 @@
     --darker-gray-color: #ced6e0;
     --font-color: #3e3e3e;
     --main-color: #1A73E8;
+    --content-height: calc(100vh - 37px);
 }
 
 *{
