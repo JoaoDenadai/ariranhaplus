@@ -75,7 +75,7 @@ async function awaitLoading<T>(Function: () => Promise<T>) {
 document.addEventListener("DOMContentLoaded", () => {
     initWindowResponseProcess();
     initWindowEvents();
-    toolbar_el.addPoolEventsFunction(dragAndDropPoolevent);
+    toolbar_el.make.PoolEvents.new(dragAndDropPoolevent);
 
     Thread.New(async () => {
         const get = async () => {
@@ -112,7 +112,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 500);
 
     toolbar_el.addElementsByStringArray(["Teste1", "Teste2", "Teste3"]);
-    toolbar_el.addPoolEventsInAllElements();
+    toolbar_el.make.PoolEvents.run();
     console.log(toolbar_el.Toolbar_Elements);
 
     (document.getElementById("SETTINGS") as HTMLElement).style.display = "none";

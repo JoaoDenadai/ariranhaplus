@@ -32,11 +32,10 @@ class Toolbar {
         this.Toolbar_Container = toolbar;
         this.Content_Container = content;
 
-
         /**
          * @param {HTMLElement[]} preload_toolbarElements
          * Variável responsável por importar elementos já existentes no container da barra de abas.
-         * Caso já exista um elemento (Tipo uma aba) no momento da construção, ele importa a aba.
+         * Caso já exista uma aba já predefinida no momento da construção, ele importa a aba.
          */
         const preload_toolbarElements: HTMLElement[] = Array.from(toolbar.children) as HTMLElement[];
         preload_toolbarElements.forEach((children) => {
@@ -54,72 +53,134 @@ class Toolbar {
         });
     }
 
-    /**
-     * 
-     * @param element
-     * Elemento da barra de abas.
-     * @returns 
-     * Retorna uma string com o Dataset correspondente do elemento de conteúdo.
-     */
-    public getDatasetByToolbarElementId(element: HTMLElement): string {
-        return element.id.split(this.ToolbarElement_id_base)[1];
-    }
-
-    /**
-     * @param element 
-     * Elemento da barra de abas.
-     * @returns 
-     * Retorna a lista de elementos relacionados a aba passada via argumento.
-     */
-    public getScreenElementByToolbarElement(element: HTMLDivElement) {
-        return Array.from(document.querySelectorAll(`[data-screen="${this.getDatasetByToolbarElementId(element)}"]`)) as HTMLElement[];
-    }
-
-    /**
-     * Função que organiza os elementos da barra de tarefas.
-     * Útil caso, visualmente, um elemento seja alterado via HTML e que seja necessário alterar a ordem na lista de elementos.
-     * @returns 
-     * Retorna a lista de elementos reordenada.
-     */
-    public sortToolbarElements(): [] {
-        /* Limpa o conteúdo dos elementos.
-         */
-        this.Toolbar_Elements.length = 0;
-
-        /* Para cada elemento filho da barra de abas...
-         */
-        for (let i = 0; i < this.Toolbar_Container.children.length; i++) {
-            /* ...pega o elemento...
-             */
-            const el = this.Toolbar_Container.children[i] as HTMLDivElement;
-
-            /* ...e inclui na ordem atual cada elemento filho pertencente a barra de abas.
-             */
-            this.Toolbar_Elements.push({ title: this.getDatasetByToolbarElementId(el), toolbarElement: el, contentElementDataset: this.getDatasetByToolbarElementId(el) });
-        }
-        return this.Toolbar_Elements as [];
-    }
-
-    /**
-     * Função que seleciona a aba apenas ao ser chamada. É necessário passar o título da aba.
-     * @param {string} title
-     * Título da aba a ser selecionada
-     * @memberof Toolbar
-     */
-    public selectElementByTitle(title: string): void {
-        // Percorre todos os elementos da barra de abas
-        this.Toolbar_Elements.forEach((el) => {
-            // Se o título do elemento da barra de abas foi igual ao título passado como parâmetro...
-            if (el.title === title) {
-                // Pinta o fundo da aba de branco e apresenta o conteúdo da aba.
-                el.toolbarElement.style.backgroundColor = "white";
-                (document.querySelector(`[data-screen="${el.contentElementDataset}"]`) as HTMLElement).style.display = "";
-            } else {
-                el.toolbarElement.style.backgroundColor = "";
-                (document.querySelector(`[data-screen="${el.contentElementDataset}"]`) as HTMLElement).style.display = "none";
-            }
+    private refreshToolbarSelection() {
+        (this.Toolbar_Elements).forEach((el) => {
+            el.toolbarElement.style.backgroundColor = "";
+            (document.querySelector(`[data-screen="${el.contentElementDataset}"]`) as HTMLElement).style.display = "";
         });
     }
+
+    public make = {
+        sort: () => {
+            /* Limpa o conteúdo dos elementos.
+             */
+            this.Toolbar_Elements.length = 0;
+
+            /* Para cada elemento filho da barra de abas...
+             */
+            for (let i = 0; i < this.Toolbar_Container.children.length; i++) {
+                /* ...pega o elemento...
+                 */
+                const el = this.Toolbar_Container.children[i] as HTMLDivElement;
+
+                /* ...e inclui na ordem atual cada elemento filho pertencente a barra de abas.
+                 */
+                this.Toolbar_Elements.push({ title: this.get.Dataset.fromToolbarElementId(el), toolbarElement: el, contentElementDataset: this.get.Dataset.fromToolbarElementId(el) });
+            }
+            return this.Toolbar_Elements as [];
+        },
+        select: {
+            byTitle: (title: string) => {
+                this.refreshToolbarSelection();
+
+                // Percorre todos os elementos da barra de abas
+                this.Toolbar_Elements.forEach((el) => {
+                    // Se o título do elemento da barra de abas foi igual ao título passado como parâmetro...
+                    if (el.title === title) {
+                        // Pinta o fundo da aba de branco e apresenta o conteúdo da aba.
+                        el.toolbarElement.style.backgroundColor = "white";
+                        (this.get.Content.fromToolbarElement(el.toolbarElement)[0]).style.display = "";
+                    }
+                });
+            },
+        },
+        remove: {
+            byTitle: (title: string) => {
+                const index = this.Toolbar_Elements.findIndex((item) => item.title === title);
+                const childrens = this.get.Content.fromToolbarElement(this.Toolbar_Elements[index].toolbarElement);
+                childrens.forEach((el) => {
+                    el.remove();
+                });
+
+                this.Toolbar_Elements[index].toolbarElement.remove();
+
+                this.Toolbar_Elements.splice(index, 1);
+            },
+            byIndex: (index: number) => {
+                const childrens = this.get.Content.fromToolbarElement(this.Toolbar_Elements[index].toolbarElement);
+                childrens.forEach((el) => {
+                    el.remove();
+                });
+                this.Toolbar_Elements.splice(index, 1);
+            }
+
+        },
+        PoolEvents: {
+            new: (poolFunction: (...args: any[]) => any) => {
+                this.PoolEvents.push(poolFunction);
+            },
+            run: () => {
+                this.Toolbar_Elements.forEach((el) => {
+                    const element = el;
+                    this.PoolEvents.forEach((events) => {
+                        if (!element.poolEvents || !el.poolEvents) return;
+                        if (!el.poolEvents.includes(events)) {
+                            events(element.toolbarElement, this);
+                            element.poolEvents.push(events);
+                        }
+                    });
+                });
+            }
+        }
+    };
+
+    public get = {
+        Elements: {
+            fromToolbar: () => {
+                return Array.from(this.Toolbar_Container.children).filter((element): element is HTMLElement => element instanceof HTMLElement);
+            },
+            fromContents: () => {
+                return Array.from(this.Content_Container.children).filter((element): element is HTMLElement => element instanceof HTMLElement);
+            }
+        },
+        Dataset: {
+            fromToolbarElementId: (toolbarElement: HTMLDivElement): string => {
+                return toolbarElement.id.split(this.ToolbarElement_id_base)[1];
+            },
+            fromToolbarElementTitle: (title: string): string | undefined => {
+                const element = this.Toolbar_Elements.find(e => e.title === title);
+                if (!element) {
+                    return undefined;
+                }
+                return this.get.Dataset.fromToolbarElementId(element.toolbarElement);
+            }
+        },
+        Content: {
+            fromToolbarElement: (toolbarElement: HTMLDivElement): HTMLElement[] => {
+                return Array.from(document.querySelectorAll(`[data-screen="${this.get.Dataset.fromToolbarElementId(toolbarElement)}"]`)) as HTMLElement[];
+            },
+            fromToolbarElementTitle: (title: string): HTMLElement[] => {
+                const toolbarElement = this.Toolbar_Elements.find(e => e.title === title);
+                if (!toolbarElement) return [];
+
+                const contentElements: HTMLElement[] = Array.from(document.querySelectorAll(`[data-screen="${this.get.Dataset.fromToolbarElementId(toolbarElement.toolbarElement)}"]`));
+                return contentElements.filter((el): el is HTMLElement => el instanceof HTMLElement);;
+            },
+        },
+        Selected: {
+            toolbarElementTitle: () => {
+                const selected: ToolbarElements | undefined = this.Toolbar_Elements.find(el => el.toolbarElement.style.backgroundColor === "white");
+                if (!selected) return;
+                return selected.title;
+            },
+
+            toolbarElement: () => {
+                const selected: ToolbarElements | undefined = this.Toolbar_Elements.find(el => el.toolbarElement.style.backgroundColor === "white");
+                if (!selected) return;
+                return selected.toolbarElement;
+            }
+        }
+    };
 
     /**
      * Função que adiciona vários elementos apenas através de um (ou mais) título.
@@ -179,7 +240,7 @@ class Toolbar {
 
             // Se for o primeiro elemento adicionado, pinta seu fundo de branco.
             if (this.Toolbar_Elements.length === 1) {
-                this.selectElementByTitle(title);
+                this.make.select.byTitle(title);
             }
         });
     }
@@ -241,18 +302,9 @@ class Toolbar {
 
         // Caso seja a primeira aba, seleciona a aba.
         if (this.Toolbar_Elements.length === 1) {
-            this.selectElementByTitle(uniqueTitle);
+            this.make.select.byTitle(uniqueTitle);
         }
     };
-
-    public getSelectedElementTitle() {
-        const selected: ToolbarElements | undefined = this.Toolbar_Elements.find(el => el.toolbarElement.style.backgroundColor === "white");
-        if (!selected) {
-            return;
-        } else {
-            return selected.title;
-        }
-    }
 
     /**
      * Função que seleciona o primeiro elemento da barra de abas após o selecionado ser removido.
@@ -260,85 +312,30 @@ class Toolbar {
      * @memberof Toolbar
      */
     public selectFirstElementWhenRemoved() {
+        // Se a barra de tarefas estiver vazia, ele não faz nada, apenas retorna.
         if (this.Toolbar_Elements.length < 1) {
             return;
         }
 
-        if (this.getSelectedElementTitle()) {
+        // Caso o elemento selecionado não seja o excluído, ele irá manter a seleção no que está atualmente.
+        if (this.get.Selected.toolbarElementTitle()) {
             return;
         }
 
-        (this.getElementsFromToolbar()).forEach((toolbarElement) => {
-            if (!toolbarElement) return;
-            toolbarElement.style.backgroundColor = "";
-        });
-
-        const next = this.Toolbar_Elements[0].toolbarElement;
-        next.style.backgroundColor = "white";
-
-        (this.getElementsFromContents()).forEach((contentElement) => {
-            if (contentElement.dataset.screen !== next.id.split(this.ToolbarElement_id_base)[1]) {
-                contentElement.style.display = "none";
-            } else {
-                contentElement.style.display = "";
-            }
-        });
+        // Atualiza as cores das abas.
+        this.refreshToolbarSelection();
+        this.make.select.byTitle(this.Toolbar_Elements[0].title as string);
     }
-
-    public getElementsFromToolbar(): HTMLElement[] {
-        return Array.from(this.Toolbar_Container.children).filter((element): element is HTMLElement => element instanceof HTMLElement);
-    }
-
-    public getElementsFromContents(): HTMLElement[] {
-        return Array.from(this.Content_Container.children).filter((element): element is HTMLElement => element instanceof HTMLElement);
-    }
-
-    public removeByTitle(Title: string) {
-        const index = this.Toolbar_Elements.findIndex((item) => item.title === Title);
-        const childrens = this.getScreenElementByToolbarElement(this.Toolbar_Elements[index].toolbarElement);
-        childrens.forEach((el) => {
-            el.remove();
-        });
-
-        this.Toolbar_Elements[index].toolbarElement.remove();
-
-        this.Toolbar_Elements.splice(index, 1);
-    };
-
-    public removeByIndex(index: number) {
-        const childrens = this.getScreenElementByToolbarElement(this.Toolbar_Elements[index].toolbarElement);
-        childrens.forEach((el) => {
-            el.remove();
-        });
-        this.Toolbar_Elements.splice(index, 1);
-    }
-
-    public addPoolEventsFunction(poolFunction: (...args: any[]) => any) {
-        this.PoolEvents.push(poolFunction);
-    }
-
-    public addPoolEventsInAllElements() {
-        this.Toolbar_Elements.forEach((el) => {
-            const element = el;
-            this.PoolEvents.forEach((events) => {
-                if (!el.poolEvents?.includes(events)) {
-                    console.log(element.poolEvents);
-                    events(element.toolbarElement, this);
-                    element.poolEvents?.push(events);
-                }
-            });
-        });
-    }
-}
+};
 
 function dragAndDropPoolevent(element: HTMLElement, toolbar: Toolbar) {
-    toolbar.ChildrensToolbar = toolbar.getElementsFromToolbar();
-    toolbar.ChildrensContent = toolbar.getElementsFromContents();
+    toolbar.ChildrensToolbar = toolbar.get.Elements.fromToolbar();
+    toolbar.ChildrensContent = toolbar.get.Elements.fromContents();
 
-    const sort = () => toolbar.sortToolbarElements();
+    const sort = () => toolbar.make.sort();
 
     element.querySelector(".close")?.addEventListener("click", (event) => {
-        toolbar.removeByTitle(toolbar.getDatasetByToolbarElementId(element));
+        toolbar.make.remove.byTitle(toolbar.get.Dataset.fromToolbarElementId(element as HTMLDivElement));
         toolbar.selectFirstElementWhenRemoved();
         sort();
     });
@@ -378,7 +375,6 @@ function dragAndDropPoolevent(element: HTMLElement, toolbar: Toolbar) {
 
             if (Math.abs(delta) > movimentCapToMove || movimentEnabled) {
                 let newLeft = getLeft + delta;
-                element.style.transition = "";
                 element.style.left = `${newLeft}px`;
                 const WindowRect = element.getBoundingClientRect();
 
@@ -419,19 +415,14 @@ function dragAndDropPoolevent(element: HTMLElement, toolbar: Toolbar) {
                     break;
                 }
             }
+
             if (targetSiblingIndex === -1) {
                 element.parentElement!.prepend(element);
             } else {
                 siblings[targetSiblingIndex].after(element);
             }
 
-            /*
-            requestAnimationFrame(() => {
-                element.style.transition = "left 1s ease-out";
-                element.style.left = "0px";
-            });
-            */
-
+            element.style.left = "0";
             element.style.zIndex = "";
             movimentEnabled = false;
 

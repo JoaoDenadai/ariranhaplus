@@ -20,7 +20,6 @@ export default {
     "@typescript-eslint/array-type": "warn",
     "@typescript-eslint/no-empty-function": "error",
     "@typescript-eslint/no-empty-interface": "error",
-    "@typescript-eslint/no-unsafe-call": "warn",
     "@typescript-eslint/no-use-before-define": "error",
     "@typescript-eslint/promise-function-async": "error",
   },
