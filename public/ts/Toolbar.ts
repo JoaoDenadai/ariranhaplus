@@ -1,9 +1,13 @@
+type PoolEventFn = (element: HTMLElement, toolbar?: Toolbar, ...args: unknown[]) => unknown | undefined;
+
 interface ToolbarElements {
-    title: string | undefined,
+    title: string,
     toolbarElement: HTMLDivElement,
-    contentElementDataset: string,
-    poolEvents?: ((...args: any) => any)[] | undefined,
+    dataset: string,
+    poolEvents?: PoolEventFn[]
 }
+
+
 
 class Toolbar {
     private Toolbar_Container: HTMLDivElement;          //Container da barra de abas
@@ -15,7 +19,7 @@ class Toolbar {
 
     public ToolbarElement_id_base: string = "Ariranha_PluginModule_";
     public ContentElement_id_base: string = "Ariranha_PluginContainer_";
-    public PoolEvents: ((element: HTMLElement, toolbar?: Toolbar, ...args: any) => any)[] = [];
+    public PoolEvents: PoolEventFn[] = [];
 
     /**
      * Construtor que inicializa a instância da barra
@@ -28,9 +32,9 @@ class Toolbar {
      * 
      * @memberof Toolbar
      */
-    constructor(toolbar: HTMLDivElement, content: HTMLDivElement, poolEventsFunction?: ((element: HTMLElement, toolbar?: Toolbar, ...args: any) => any)) {
-        this.Toolbar_Container = toolbar;
-        this.Content_Container = content;
+    constructor(toolbar: HTMLDivElement, content: HTMLDivElement, poolEventsFunction?: PoolEventFn) {
+        this.Toolbar_Container = toolbar as HTMLDivElement;
+        this.Content_Container = content as HTMLDivElement;
 
         /**
          * @param {HTMLElement[]} preload_toolbarElements
@@ -39,29 +43,42 @@ class Toolbar {
          */
         const preload_toolbarElements: HTMLElement[] = Array.from(toolbar.children) as HTMLElement[];
         preload_toolbarElements.forEach((children) => {
-            const events: ((el: HTMLElement, toolbar?: Toolbar, ...args: any) => any)[] = [];
+            const eventsFn: PoolEventFn[] = [];
 
             if (poolEventsFunction) {
                 poolEventsFunction(children, this);
-                events.push(poolEventsFunction);
+                eventsFn.push(poolEventsFunction);
             }
+
+            let T_title: string;
+            if (!children.textContent) {
+                if (children.id) {
+                    T_title = children.id;
+                } else {
+                    T_title = "Untitled";
+
+                }
+            } else {
+                T_title = children.textContent;
+            }
+
             /**
              *  Aplica um push ao elemnto this.Toolbar_Elements, incluindo os elementos já existentes na variável.
              */
-            this.Toolbar_Elements.push({ title: children.textContent ?? children.id ?? undefined, toolbarElement: children as HTMLDivElement, contentElementDataset: `${this.ContentElement_id_base}${children.id ?? undefined}`, poolEvents: events });
+            this.Toolbar_Elements.push({ title: T_title, toolbarElement: children as HTMLDivElement, dataset: `${this.ContentElement_id_base}${T_title}`, poolEvents: eventsFn });
 
         });
     }
 
-    private refreshToolbarSelection() {
-        (this.Toolbar_Elements).forEach((el) => {
+    private refresh(): void {
+        (this.Toolbar_Elements).forEach((el: ToolbarElements) => {
             el.toolbarElement.style.backgroundColor = "";
-            (document.querySelector(`[data-screen="${el.contentElementDataset}"]`) as HTMLElement).style.display = "";
+            (document.querySelector(`[data-screen="${el.dataset}"]`) as HTMLElement).style.display = "";
         });
     }
 
-    public make = {
-        sort: () => {
+    public tabs = {
+        sort: (): [] => {
             /* Limpa o conteúdo dos elementos.
              */
             this.Toolbar_Elements.length = 0;
@@ -75,13 +92,13 @@ class Toolbar {
 
                 /* ...e inclui na ordem atual cada elemento filho pertencente a barra de abas.
                  */
-                this.Toolbar_Elements.push({ title: this.get.Dataset.fromToolbarElementId(el), toolbarElement: el, contentElementDataset: this.get.Dataset.fromToolbarElementId(el) });
+                this.Toolbar_Elements.push({ title: this.get.Dataset.fromToolbarElementId(el), toolbarElement: el, dataset: this.get.Dataset.fromToolbarElementId(el) });
             }
             return this.Toolbar_Elements as [];
         },
         select: {
-            byTitle: (title: string) => {
-                this.refreshToolbarSelection();
+            byTitle: (title: string): void => {
+                this.refresh();
 
                 // Percorre todos os elementos da barra de abas
                 this.Toolbar_Elements.forEach((el) => {
@@ -93,9 +110,36 @@ class Toolbar {
                     }
                 });
             },
+            byIndex: (Index: number): void => {
+                this.refresh();
+
+                // Percorre todos os elementos da barra de abas
+                this.Toolbar_Elements.forEach((el, index) => {
+                    // Se o título do elemento da barra de abas foi igual ao título passado como parâmetro...
+                    if (index === Index) {
+                        // Pinta o fundo da aba de branco e apresenta o conteúdo da aba.
+                        el.toolbarElement.style.backgroundColor = "white";
+                        (this.get.Content.fromToolbarElement(el.toolbarElement)[0]).style.display = "";
+                    }
+                });
+            },
+            firstTab: (): void => {
+                if (this.Toolbar_Elements.length < 1) {
+                    return;
+                }
+
+                // Caso o elemento selecionado não seja o excluído, ele irá manter a seleção no que está atualmente.
+                if (this.get.Selected.toolbarElementTitle()) {
+                    return;
+                }
+
+                // Atualiza as cores das abas.
+                this.refresh();
+                this.tabs.select.byTitle(this.Toolbar_Elements[0].title as string);
+            }
         },
         remove: {
-            byTitle: (title: string) => {
+            byTitle: (title: string): void => {
                 const index = this.Toolbar_Elements.findIndex((item) => item.title === title);
                 const childrens = this.get.Content.fromToolbarElement(this.Toolbar_Elements[index].toolbarElement);
                 childrens.forEach((el) => {
@@ -106,7 +150,7 @@ class Toolbar {
 
                 this.Toolbar_Elements.splice(index, 1);
             },
-            byIndex: (index: number) => {
+            byIndex: (index: number): void => {
                 const childrens = this.get.Content.fromToolbarElement(this.Toolbar_Elements[index].toolbarElement);
                 childrens.forEach((el) => {
                     el.remove();
@@ -116,10 +160,10 @@ class Toolbar {
 
         },
         PoolEvents: {
-            new: (poolFunction: (...args: any[]) => any) => {
-                this.PoolEvents.push(poolFunction);
+            new: (poolFunction: (...args: any) => any): void => {
+                this.PoolEvents.push(poolFunction as PoolEventFn);
             },
-            run: () => {
+            run: (): void => {
                 this.Toolbar_Elements.forEach((el) => {
                     const element = el;
                     this.PoolEvents.forEach((events) => {
@@ -136,10 +180,10 @@ class Toolbar {
 
     public get = {
         Elements: {
-            fromToolbar: () => {
+            fromToolbar: (): HTMLElement[] => {
                 return Array.from(this.Toolbar_Container.children).filter((element): element is HTMLElement => element instanceof HTMLElement);
             },
-            fromContents: () => {
+            fromContents: (): HTMLElement[] => {
                 return Array.from(this.Content_Container.children).filter((element): element is HTMLElement => element instanceof HTMLElement);
             }
         },
@@ -168,13 +212,13 @@ class Toolbar {
             },
         },
         Selected: {
-            toolbarElementTitle: () => {
+            toolbarElementTitle: (): string | undefined => {
                 const selected: ToolbarElements | undefined = this.Toolbar_Elements.find(el => el.toolbarElement.style.backgroundColor === "white");
                 if (!selected) return;
                 return selected.title;
             },
 
-            toolbarElement: () => {
+            toolbarElement: (): HTMLDivElement | undefined => {
                 const selected: ToolbarElements | undefined = this.Toolbar_Elements.find(el => el.toolbarElement.style.backgroundColor === "white");
                 if (!selected) return;
                 return selected.toolbarElement;
@@ -182,162 +226,132 @@ class Toolbar {
         }
     };
 
-    /**
-     * Função que adiciona vários elementos apenas através de um (ou mais) título.
-     * @param titles 
-     * Um array de string com o título das abas.
-     */
-    public addElementsByStringArray(titles: string[]) {
-        // Para cada título...
-        titles.forEach((elementTitle) => {
-            let title = elementTitle;
+    public new() {
+        return {
+            tab: {
+                addElementByStringArray: (titles: string[]): void => {
+                    titles.forEach((elementTitle) => {
+                        let title = elementTitle;
 
-            let i = 1;
-            while (this.Toolbar_Elements.some(el => el.title === title)) {
-                title = `${elementTitle}_${i}`;
-                i++;
+                        let i = 1;
+                        while (this.Toolbar_Elements.some(el => el.title === title)) {
+                            title = `${elementTitle}_${i}`;
+                            i++;
+                        }
+
+                        //...tenta importar o elemento de conteúdo...
+                        const divElement = this.Content_Container.querySelector(`div[data-screen="${title}"]`);
+
+                        // Verifica se o elemento de conteúdo existe, senão...
+                        if (!divElement) {
+                            // Cria um novo elemento de conteúdo, altera seu dataset-screen para o título passado...
+                            const newContent = document.createElement("div");
+                            newContent.dataset.screen = title;
+                            newContent.id = `${this.ContentElement_id_base}${title}`;
+                            newContent.style.display = "none";
+
+                            //... e vincula o conteúdo no container de conteúdos.
+                            this.Content_Container.appendChild(newContent);
+                        }
+
+                        // Cria uma nova aba...
+                        const newTab = document.createElement("div");
+                        // ...inclui o título...
+                        const text = document.createTextNode(title);
+                        // ...adiciona o botão de fechar e passa o Path da imagem...
+                        const close = document.createElement("img");
+                        close.src = "./assets/images/close.png";
+                        close.classList.add("close");
+
+                        // Adiciona um novo Id ao elemento da aba.
+                        newTab.id = `Ariranha_PluginModule_${title}`;
+                        // Adiciona o título e a imagem de fechar aba.
+                        newTab.appendChild(text);
+                        newTab.appendChild(close);
+
+                        // Adiciona a nova aba criada ao container das abas.
+                        this.Toolbar_Container.appendChild(newTab);
+
+                        // Inclui a aba na lista de abas.
+                        this.Toolbar_Elements.push({ title: title, toolbarElement: newTab, dataset: title, poolEvents: [] });
+                        const added = this.Toolbar_Elements[this.Toolbar_Elements.length - 1].toolbarElement;
+
+                        this.PoolEvents.forEach(event => event(added, this));
+
+
+                        // Se for o primeiro elemento adicionado, pinta seu fundo de branco.
+                        if (this.Toolbar_Elements.length === 1) {
+                            this.tabs.select.byTitle(title);
+                        }
+                    });
+                },
+
+                addElementByContentElement: (element: HTMLElement, title: string): void => {
+                    // Passa o título da aba para uma variável local.
+                    // Permite manipular o título.
+                    let uniqueTitle = title;
+
+                    // Repetição que verifica se a aba já existe.
+                    // Caso exista, ele irá automaticamente corrigir o título, adicionando um indice na frente do título.
+                    let i = 1;
+                    while (this.Toolbar_Elements.some(e => e.title === uniqueTitle)) {
+                        uniqueTitle = `${title}_${i}`;
+                        i++;
+                    }
+
+                    // Define parâmetros básicos do elemento de conteúdo. 
+                    element.dataset.screen = uniqueTitle;
+                    element.style.display = "none";
+                    element.id = `${this.ContentElement_id_base}${uniqueTitle}`;
+
+                    // Elemento da aba.
+                    const newElement = document.createElement("div");
+                    newElement.id = `Ariranha_PluginModule_${uniqueTitle}`;
+
+                    // Adiciona o título da aba.
+                    const text = document.createTextNode(uniqueTitle);
+
+                    // Imagem do botão de fechar aba.
+                    const close = document.createElement("img");
+                    close.src = "./assets/images/close.png";
+                    close.classList.add("close");
+
+                    // Vincula o título e o botão de fechar aba na própria aba.
+                    newElement.appendChild(text);
+                    newElement.appendChild(close);
+
+                    // Vincula a aba e o conteúdo.
+                    this.Toolbar_Container.appendChild(newElement);
+                    this.Content_Container.appendChild(element);
+
+                    // Adiciona a aba na lista de abas gerenciada pela classe.
+                    this.Toolbar_Elements.push({ title: uniqueTitle, toolbarElement: newElement, dataset: element.dataset.screen, poolEvents: [] });
+                    const added = this.Toolbar_Elements[this.Toolbar_Elements.length - 1].toolbarElement;
+
+                    this.PoolEvents.forEach(event => event(added, this));
+
+                    // Caso seja a primeira aba, seleciona a aba.
+                    if (this.Toolbar_Elements.length === 1) {
+                        this.tabs.select.byTitle(uniqueTitle);
+                    }
+                }
             }
 
-            //...tenta importar o elemento de conteúdo...
-            const divElement = this.Content_Container.querySelector(`div[data-screen="${title}"]`);
-
-            // Verifica se o elemento de conteúdo existe, senão...
-            if (!divElement) {
-                // Cria um novo elemento de conteúdo, altera seu dataset-screen para o título passado...
-                const newContent = document.createElement("div");
-                newContent.dataset.screen = title;
-                newContent.id = `${this.ContentElement_id_base}${title}`;
-                newContent.style.display = "none";
-
-                //... e vincula o conteúdo no container de conteúdos.
-                this.Content_Container.appendChild(newContent);
-            }
-
-            // Cria uma nova aba...
-            const newTab = document.createElement("div");
-            // ...inclui o título...
-            const text = document.createTextNode(title);
-            // ...adiciona o botão de fechar e passa o Path da imagem...
-            const close = document.createElement("img");
-            close.src = "./assets/images/close.png";
-            close.classList.add("close");
-
-            // Adiciona um novo Id ao elemento da aba.
-            newTab.id = `Ariranha_PluginModule_${title}`;
-            // Adiciona o título e a imagem de fechar aba.
-            newTab.appendChild(text);
-            newTab.appendChild(close);
-
-            // Adiciona a nova aba criada ao container das abas.
-            this.Toolbar_Container.appendChild(newTab);
-
-            // Inclui a aba na lista de abas.
-            this.Toolbar_Elements.push({ title: title, toolbarElement: newTab, contentElementDataset: title, poolEvents: [] });
-            const added = this.Toolbar_Elements[this.Toolbar_Elements.length - 1].toolbarElement;
-
-            this.PoolEvents.forEach(event => event(added, this));
-
-
-            // Se for o primeiro elemento adicionado, pinta seu fundo de branco.
-            if (this.Toolbar_Elements.length === 1) {
-                this.make.select.byTitle(title);
-            }
-        });
+        };
     }
 
-    /**
-     * Função que adiciona uma nova aba a partir de um elemento de conteúdo.
-     *
-     * @param {HTMLElement} element
-     * Elemento de conteúdo.
-     * 
-     * @param {string} title
-     * Título da aba.
-     * 
-     * @memberof Toolbar
-     */
-    public addNewToolbarElementByContentElement(element: HTMLElement, title: string): void {
-        // Passa o título da aba para uma variável local.
-        // Permite manipular o título.
-        let uniqueTitle = title;
-
-        // Repetição que verifica se a aba já existe.
-        // Caso exista, ele irá automaticamente corrigir o título, adicionando um indice na frente do título.
-        let i = 1;
-        while (this.Toolbar_Elements.some(e => e.title === uniqueTitle)) {
-            uniqueTitle = `${title}_${i}`;
-            i++;
-        }
-
-        // Define parâmetros básicos do elemento de conteúdo. 
-        element.dataset.screen = uniqueTitle;
-        element.style.display = "none";
-        element.id = `${this.ContentElement_id_base}${uniqueTitle}`;
-
-        // Elemento da aba.
-        const newElement = document.createElement("div");
-        newElement.id = `Ariranha_PluginModule_${uniqueTitle}`;
-
-        // Adiciona o título da aba.
-        const text = document.createTextNode(uniqueTitle);
-
-        // Imagem do botão de fechar aba.
-        const close = document.createElement("img");
-        close.src = "./assets/images/close.png";
-        close.classList.add("close");
-
-        // Vincula o título e o botão de fechar aba na própria aba.
-        newElement.appendChild(text);
-        newElement.appendChild(close);
-
-        // Vincula a aba e o conteúdo.
-        this.Toolbar_Container.appendChild(newElement);
-        this.Content_Container.appendChild(element);
-
-        // Adiciona a aba na lista de abas gerenciada pela classe.
-        this.Toolbar_Elements.push({ title: uniqueTitle, toolbarElement: newElement, contentElementDataset: element.dataset.screen, poolEvents: [] });
-        const added = this.Toolbar_Elements[this.Toolbar_Elements.length - 1].toolbarElement;
-
-        this.PoolEvents.forEach(event => event(added, this));
-
-        // Caso seja a primeira aba, seleciona a aba.
-        if (this.Toolbar_Elements.length === 1) {
-            this.make.select.byTitle(uniqueTitle);
-        }
-    };
-
-    /**
-     * Função que seleciona o primeiro elemento da barra de abas após o selecionado ser removido.
-     *
-     * @memberof Toolbar
-     */
-    public selectFirstElementWhenRemoved() {
-        // Se a barra de tarefas estiver vazia, ele não faz nada, apenas retorna.
-        if (this.Toolbar_Elements.length < 1) {
-            return;
-        }
-
-        // Caso o elemento selecionado não seja o excluído, ele irá manter a seleção no que está atualmente.
-        if (this.get.Selected.toolbarElementTitle()) {
-            return;
-        }
-
-        // Atualiza as cores das abas.
-        this.refreshToolbarSelection();
-        this.make.select.byTitle(this.Toolbar_Elements[0].title as string);
-    }
 };
 
 function dragAndDropPoolevent(element: HTMLElement, toolbar: Toolbar) {
     toolbar.ChildrensToolbar = toolbar.get.Elements.fromToolbar();
     toolbar.ChildrensContent = toolbar.get.Elements.fromContents();
 
-    const sort = () => toolbar.make.sort();
+    const sortToolbar = () => toolbar.tabs.sort();
 
     element.querySelector(".close")?.addEventListener("click", (event) => {
-        toolbar.make.remove.byTitle(toolbar.get.Dataset.fromToolbarElementId(element as HTMLDivElement));
-        toolbar.selectFirstElementWhenRemoved();
-        sort();
+        toolbar.tabs.remove.byTitle(toolbar.get.Dataset.fromToolbarElementId(element as HTMLDivElement));
+        toolbar.tabs.select.firstTab();
+        sortToolbar();
     });
 
     element.addEventListener("click", (event) => {
@@ -426,7 +440,7 @@ function dragAndDropPoolevent(element: HTMLElement, toolbar: Toolbar) {
             element.style.zIndex = "";
             movimentEnabled = false;
 
-            sort();
+            sortToolbar();
         }
 
         document.addEventListener("mousemove", onMouseMove);

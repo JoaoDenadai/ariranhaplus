@@ -35,7 +35,7 @@ function initWindowResponseProcess() {
     });
 
     window.Plugins_.addNewTab((Title: string) => {
-        toolbar_el.addElementsByStringArray([Title]);
+        toolbar_el.new().tab.addElementByStringArray([Title]);
     });
 
     window.Plugins_.insertContentInElementId((targetId, html, css, js) => {
@@ -75,7 +75,7 @@ async function awaitLoading<T>(Function: () => Promise<T>) {
 document.addEventListener("DOMContentLoaded", () => {
     initWindowResponseProcess();
     initWindowEvents();
-    toolbar_el.make.PoolEvents.new(dragAndDropPoolevent);
+    toolbar_el.tabs.PoolEvents.new(dragAndDropPoolevent);
 
     Thread.New(async () => {
         const get = async () => {
@@ -111,8 +111,8 @@ document.addEventListener("DOMContentLoaded", () => {
         (document.getElementById("memory_use") as HTMLLabelElement).textContent = `${Math.round(totalMb).toString()} MB`;
     }, 500);
 
-    toolbar_el.addElementsByStringArray(["Teste1", "Teste2", "Teste3"]);
-    toolbar_el.make.PoolEvents.run();
+    toolbar_el.new().tab.addElementByStringArray(["Teste1", "Teste2", "Teste3"]);
+    toolbar_el.tabs.PoolEvents.run();
     console.log(toolbar_el.Toolbar_Elements);
 
     (document.getElementById("SETTINGS") as HTMLElement).style.display = "none";
