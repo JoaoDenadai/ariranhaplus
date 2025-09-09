@@ -1,35 +1,69 @@
+/*
+ *  Classe Tooltip.ts
+ *  Classe responsável por adicionar a janela dinâmica de dicas ao passar o mouse sob um elemento.
+ */
+
 class Tooltip {
     public tooltip_element: HTMLElement;
+    public dataset: string;
+    public timeout: number;
+
     private tooptip_show: boolean = false;
     private timeoutId: number | null = null;
     private mouseX: number = 0;
     private mouseY: number = 0;
 
-    constructor() {
+    /**
+     * Creates an instance of Tooltip.
+     * @memberof Tooltip
+     */
+    constructor(dataset: string = "data-tooltip", id: string = "dynamic-tooltip", timeoutMs: number) {
+        this.dataset = dataset;
         this.tooltip_element = document.createElement("div");
-        this.tooltip_element.id = "dynamic-tooltip";
-        document.body.appendChild(this.tooltip_element);
-        this.initTooltip();
+        this.timeout = timeoutMs;
+
+        this.createElement(id);
+        // Inicializa os eventos.
+        this.init();
     };
 
-    public initTooltip() {
-        document.querySelectorAll("[data-tooltip]").forEach((element) => {
+    private createElement(id: string) {
+        // Adiciona ao id genérico do tooltip.
+        this.tooltip_element.id = id;
+        // Adiciona o container da janela dinâmica ao documento.
+        document.body.appendChild(this.tooltip_element);
+    }
+
+    public init() {
+        //
+        // Para cada elemento que contém o dataset passado na construção da classe... 
+        document.querySelectorAll(`[${this.dataset}]`).forEach((element) => {
+            // ...quando o mouse entrar no elemento...
             element.addEventListener("mouseenter", (e: any) => {
+                // Armazena a posição X e Y desse element.
                 this.mouseX = e.pageX;
                 this.mouseY = e.pageY;
 
+                // Armazena o alvo (Ou seja, o elemento).
                 const target = e.currentTarget as HTMLElement;
 
+                // Verifica se já existe algum timeout.
+                // Caso exista, apenas limpa o intervalo.
                 if (this.timeoutId) clearTimeout(this.timeoutId);
 
+                // Aguarda uma quantidade determinada de tempo até mostrar a janela dinâmica.
                 this.timeoutId = window.setTimeout(() => {
+                    // Após aguardar um tempo com o mouse em cima do element, ele habilita o sistema a mostrar a janela dinâmica.
                     this.tooptip_show = true;
                     this.show(target);
-                }, 1000);
+                }, this.timeout);
             });
+            // ...quando o mouse se mover...
             element.addEventListener("mousemove", (e: any) => {
+                // Atualiza a posição da janela dinâmica.
                 this.mouseX = e.pageX;
                 this.mouseY = e.pageY;
+                // Se a janela estiver habilitada, ele chama a função de mmovimento.
                 if (this.tooptip_show) this.movement();
             });
             element.addEventListener("mouseleave", () => this.hide());
@@ -37,6 +71,7 @@ class Tooltip {
     }
 
     private movement() {
+        if (!this.tooltip_element) return;
         const offsetX = 20;
         const offsetY = 20;
         let left = this.mouseX + offsetX;
@@ -56,6 +91,7 @@ class Tooltip {
     }
 
     private show(e: HTMLElement) {
+        if (!this.tooltip_element) return;
         let html = "";
         let text: string = e.dataset.tooltip as string;
         if (!text) return;
@@ -85,6 +121,7 @@ class Tooltip {
     }
 
     private hide() {
+        if (!this.tooltip_element) return;
         this.tooltip_element.style.opacity = "0";
         this.tooptip_show = false;
         if (this.timeoutId) clearTimeout(this.timeoutId);

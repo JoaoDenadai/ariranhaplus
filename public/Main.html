@@ -43,12 +43,29 @@
                 <input type="text" id="Settings-search" placeholder="Digite para pesquisar...">
             </div>
             <div id="Settings-divisions">
-                <div><img src="./assets/images/all.png">Geral</div>
-                <div><img src="./assets/images/brush.png">Personalização</div>
-                <div><img src="./assets/images/addon.png">Plugins</div>
+                <div id="Geral"><img src="./assets/images/all.png">Geral</div>
+                <div id="Personalização"><img src="./assets/images/brush.png">Personalização</div>
+                <div id="Plugins"><img src="./assets/images/addon.png">Plugins</div>
             </div>
         </div>
-        <div id="SETTINGS-CONTENT"></div>
+        <div id="SETTINGS-CONTENT">
+            <div data-settings-screen="Geral">
+                <div>
+                    <label>Atualizações</label>
+                    <div id="settings-items">
+                        <label>Buscar por atualizações automaticamente<input type="checkbox"></label>
+                        <label>Canal de atualização
+                            <select name="update-channels">
+                                <option>Stable</option>
+                                <option>Beta</option>
+                            </select>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div data-settings-screen="Personalização">Teste 2</div>
+            <div data-settings-screen="Plugins">Teste 3</div>
+        </div>
     </div>
   
     <footer>

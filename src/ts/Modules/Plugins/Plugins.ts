@@ -34,7 +34,7 @@ export interface PluginModule {
 export class Extension {
     private static DIR_ExtensionDirectory: string = Path.join(System.homedir(), "Ariranha", "Plugins");
     private static WIN_ExtensionWindow: SysWindow;
-    private static ExtensionsLoaded: string[];
+    private static ExtensionsLoaded: string[] = [];
     private static api: __api__ = {
         getVersion() { return Project.version; },
         readFile(path: string) {

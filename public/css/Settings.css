@@ -1,6 +1,7 @@
 #SETTINGS{
     width: 100vw;
     height: calc(100vh - 37px);
+    display: flex;
 
     background-color: var(--darker-white-color);
 }
@@ -27,7 +28,7 @@
 }
 
 #Settings-divisions div{
-    width: 87%;
+    width: 86%;
     height: 30px;
 
     background-color: var(--darker-white-color);
@@ -92,4 +93,63 @@
     border-radius: 5px;
     border: none;
     border-bottom: solid #e1e1e1 1px;
+}
+
+#SETTINGS-CONTENT {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+ 
+
+  overflow-y: auto;      
+}
+
+#SETTINGS-CONTENT > div{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    width: 98%;
+    height: 25px;
+}
+
+
+#SETTINGS-CONTENT > div div{
+    width: 100%;
+    height: 100%;
+}
+
+
+#settings-items{
+    display: flex;
+    flex-direction: column;
+
+    justify-content: space-between;
+    align-items: center;
+
+    font-size: 13px;
+    width: 100%;
+    height: 100%;
+
+    gap: 5px;
+}
+
+#settings-items label{
+    display: flex;
+    width: 100%;
+
+    justify-content: space-between;
+    align-items: center;
+}
+
+#settings-items label:first-of-type{
+    margin-top: 15px;
+}
+
+#settings-items label:last-of-type{
+    margin-bottom: 15px;
+}
+
+#settings-items select{
+    border-radius: 0;
 }

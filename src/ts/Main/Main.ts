@@ -33,12 +33,12 @@ async function createMainWindow(): Promise<void> {
 
   try {
     mWindow = new SysWindow({
-      width: 500,
-      height: 300,
-      //minHeight: 280,
-      //maxHeight: 320,
-      //minWidth: 475,
-      //maxWidth: 600,
+      width: 720,
+      height: 450,
+      minHeight: 280,
+      maxHeight: 1000,
+      minWidth: 475,
+      maxWidth: 1000,
       show: false,
       frame: false,
       webPreferences: {

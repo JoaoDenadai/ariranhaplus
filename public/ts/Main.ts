@@ -1,7 +1,7 @@
 const DIV_Toolbar = document.getElementById("TOOLBAR") as HTMLDivElement;
 const DIV_Content = document.getElementById("CONTENT") as HTMLDivElement;
 const toolbar_el = new Toolbar(DIV_Toolbar, DIV_Content);
-const tooltip_el = new Tooltip();
+const tooltip_el = new Tooltip(undefined, undefined, 1000);
 
 function initWindowResponseProcess() {
     window.WebContent.Log((msg, type) => {
@@ -111,7 +111,6 @@ document.addEventListener("DOMContentLoaded", () => {
         (document.getElementById("memory_use") as HTMLLabelElement).textContent = `${Math.round(totalMb).toString()} MB`;
     }, 500);
 
-    toolbar_el.new().tab.addElementByStringArray(["Teste1", "Teste2", "Teste3"]);
     toolbar_el.tabs.PoolEvents.run();
     console.log(toolbar_el.Toolbar_Elements);
 
