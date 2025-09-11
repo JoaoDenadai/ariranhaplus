@@ -4,6 +4,7 @@ const settings_button = document.getElementById("Window-titlebar-buttons-setting
 const settings_container = document.getElementById("Settings-divisions") as HTMLButtonElement;
 const main = document.getElementById("MAIN") as HTMLElement;
 
+
 settings_button.addEventListener("click", () => {
     console.log("clicked");
     if (content.style.display !== "none") {

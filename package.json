@@ -1,6 +1,6 @@
 {
   "name": "ariranhaplus",
-  "version": "0.0.5",
+  "version": "0.1.0",
   "description": "",
   "main": "./src/js/Main/Main.js",
   "scripts": {
@@ -59,6 +59,7 @@
   "dependencies": {
     "acorn": "^8.15.0",
     "cheerio": "^1.1.2",
-    "electron-updater": "^6.6.2"
+    "electron-updater": "^6.6.2",
+    "mysql2": "^3.14.5"
   }
 }
