@@ -53,6 +53,8 @@ declare global {
             initJs: (Callback: (JsCode: string) => void) => void
             addNewTab: (Callback: (Title: string) => void) => void
             insertContentInElementId: (Callback: (targetId: string, html: string, css: string, js: string) => void) => void
+            Terminal: (args: string) => Promise<any>
+            AllPluginsFinishedLoad: (callback: () => void) => void
         }
     }
 }

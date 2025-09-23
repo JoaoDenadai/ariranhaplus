@@ -3,6 +3,7 @@ import App from "../../../package.json";
 import Popup from '../Modules/Core/Popup/Popup';
 import SysWindow from '../Modules/Core/Window/Window';
 import { Instance } from '../Libraries/Libraries';
+import { exec } from 'child_process';
 
 let clipboardInterval: NodeJS.Timeout | null = null;
 
@@ -30,6 +31,19 @@ export default function Events(mWindow: SysWindow) {
 
     ipcMain.handle("Main:Popup", async (event, Title: string, Type: string, Message: string, Description: string, Close?: boolean) => {
         return await Popup.MessageBoxFromFrontend(Title, Type, Message, Description, Close ?? false);
+    });
+
+    ipcMain.handle("Terminal", async (event, command) => {
+        return new Promise((resolve, reject) => {
+            console.log(command);
+            exec(command, (error, stdout, stderr) => {
+                if (error) {
+                    reject(stderr);
+                } else {
+                    resolve(stdout);
+                }
+            });
+        });
     });
 
     ipcMain.handle("Clipboard: Copy", (event, content) => {

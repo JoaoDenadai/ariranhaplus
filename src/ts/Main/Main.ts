@@ -45,8 +45,6 @@ async function createMainWindow(): Promise<void> {
         nodeIntegration: false,
         contextIsolation: true,
         preload: Path.join(__dirname, "Main.Preload.js"),
-        experimentalFeatures: true,  // ativa features novas de renderização
-        scrollBounce: true           // melhora a suavidade no macOS
       }
     });
   } catch (error) {
@@ -138,5 +136,6 @@ function processInitArguments() {
   }
 
   await Extension.init(mWindow as SysWindow);
+  mWindow?.webContents.send("AllPluginsFinishedLoad");
   Updater.init(mWindow as SysWindow);
 })();

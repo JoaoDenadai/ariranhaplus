@@ -7,8 +7,6 @@ interface ToolbarElements {
     poolEvents?: PoolEventFn[]
 }
 
-
-
 class Toolbar {
     private Toolbar_Container: HTMLDivElement;          //Container da barra de abas
     private Content_Container: HTMLElement;             //Container do conteúdo

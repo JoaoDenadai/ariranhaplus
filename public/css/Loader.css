@@ -16,7 +16,7 @@
 
   /* Background and colors */
   background-color: var(--main-color);
-  animation: none;
+  animation: slide 1s ease-in-out infinite;
 
   /* Dimensions and margin */
   width: 5vw;

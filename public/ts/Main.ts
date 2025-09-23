@@ -3,11 +3,11 @@ const DIV_Content = document.getElementById("CONTENT") as HTMLDivElement;
 const toolbar_el = new Toolbar(DIV_Toolbar, DIV_Content);
 const tooltip_el = new Tooltip(undefined, undefined, 1000);
 
-function Terminal(args: string) {
-    console.log(args);
-}
-
 function initWindowResponseProcess() {
+    window.Plugins_.AllPluginsFinishedLoad(() => {
+        Loader.disable();
+    });
+
     window.WebContent.Log((msg, type) => {
         switch (type) {
             case "Error": {
@@ -29,7 +29,6 @@ function initWindowResponseProcess() {
         const fromPlugin = document.createElement('style');
         fromPlugin.textContent = Css;
         document.head.appendChild(fromPlugin);
-        console.log(Css);
     });
 
     window.Plugins_.initJs((Js: string) => {
@@ -62,21 +61,7 @@ function initWindowResponseProcess() {
     });
 };
 
-async function awaitLoading<T>(Function: () => Promise<T>) {
-    const Loader = document.getElementById("loader") as HTMLElement;
-    if (!Loader) return await Function();
-
-    void Loader.offsetWidth;
-    Loader.style.animation = "slide 1s ease-in-out infinite";
-
-    try {
-        return await Function();
-    } finally {
-        Loader.style.animation = "none";
-    }
-};
-
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", (e) => {
     initWindowResponseProcess();
     initWindowEvents();
     toolbar_el.tabs.PoolEvents.new(dragAndDropPoolevent);
@@ -105,9 +90,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 10000);
 
     Thread.New(() => {
-        const num_threads = Thread.running;
         (document.getElementById("threads_process") as HTMLImageElement).style.opacity = "1";
-        (document.getElementById("thread_count") as HTMLLabelElement).textContent = String(num_threads);
+        (document.getElementById("thread_count") as HTMLLabelElement).textContent = String(Thread.running);
     }, 500);
 
     Thread.New(async () => {
@@ -116,7 +100,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 500);
 
     toolbar_el.tabs.PoolEvents.run();
-    console.log(toolbar_el.Toolbar_Elements);
 
     (document.getElementById("SETTINGS") as HTMLElement).style.display = "none";
     loadConfig();

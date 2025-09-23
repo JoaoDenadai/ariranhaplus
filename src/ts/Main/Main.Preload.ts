@@ -50,4 +50,10 @@ contextBridge.exposeInMainWorld("Plugins_", {
     insertContentInElementId: (Callback: (targetId: string, html: string, css: string, js: string) => void) => {
         ipcRenderer.on("Plugins: insertContent (load)", (event, targetId, html, css, js) => Callback(targetId, html, css, js));
     },
+    Terminal: async (command: string) => {
+        return await ipcRenderer.invoke("Terminal", command);
+    },
+    AllPluginsFinishedLoad: (callback: () => void) => {
+        ipcRenderer.on('AllPluginsFinishedLoad', (event) => callback());
+    }
 });
