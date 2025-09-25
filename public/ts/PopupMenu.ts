@@ -72,7 +72,10 @@ class PopupMenu {
 
     addSubmenu(title: string) {
         const submenuButton = document.createElement("button");
+        const imgElement = document.createElement("img");
+        imgElement.src = "./assets/images/next.png";
         submenuButton.textContent = title;
+        submenuButton.appendChild(imgElement);
         this.menuElement.appendChild(submenuButton);
 
         const submenuElementsContainer = document.createElement("div");
@@ -81,10 +84,15 @@ class PopupMenu {
 
         this.menuElement.appendChild(submenuElementsContainer);
 
-        submenuButton.addEventListener("mouseover", () => {
+        submenuButton.addEventListener("mouseover", (e) => {
+            this.submenus.forEach(menu => {
+                menu.elementsContainer.style.display = "none";
+            });
+
             submenuElementsContainer.style.display = "block";
             submenuElementsContainer.style.top = `${submenuButton.offsetTop - 1}px`;
         });
+
         submenuElementsContainer.addEventListener("mouseover", () => {
             submenuElementsContainer.style.display = "block";
         });

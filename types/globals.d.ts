@@ -29,6 +29,18 @@ declare global {
 
     type PopupTypes = "Message" | "Confirm" | "Warning" | "Error";
     type LogTypes = "Message" | "Warning" | "Error";
+    type extensionManifestType = {
+        name: string,
+        version: string,
+        author: string,
+        package: string,
+        main: string,
+        updates: {
+            repo: string,
+            owner: string,
+            token: string
+        }
+    }
 
     interface Window {
         Popup_: {
@@ -47,6 +59,8 @@ declare global {
         };
         WebContent: {
             Log: (Callback: (Message: string, Type: LogTypes) => void) => void
+            createTempFile: (Content: string, Name: string, Extension: string) => Promise<any>
+            removeTempFile: (path: any) => void
         }
         Plugins_: {
             initCss: (Callback: (CssCode: string) => void) => void

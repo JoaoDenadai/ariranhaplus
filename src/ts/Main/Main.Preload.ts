@@ -31,6 +31,12 @@ contextBridge.exposeInMainWorld("ariranha_", {
 contextBridge.exposeInMainWorld("WebContent", {
     Log: (Callback: (Message: string, Type: LogTypes) => void) => {
         ipcRenderer.on("New: Log", (event, Message, Type) => Callback(Message, Type));
+    },
+    createTempFile: async (Content: string, Name: string, Extension: string) => {
+        return await ipcRenderer.invoke('createConfFile', Content, Name, Extension);
+    },
+    removeTempFile: (path: any) => {
+        ipcRenderer.send("removeTempFile", path);
     }
 });
 

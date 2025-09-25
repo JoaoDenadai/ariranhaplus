@@ -2,8 +2,9 @@ import { ipcMain, clipboard } from 'electron';
 import App from "../../../package.json";
 import Popup from '../Modules/Core/Popup/Popup';
 import SysWindow from '../Modules/Core/Window/Window';
-import { Instance } from '../Libraries/Libraries';
+import { Filesystem, Instance, Path, System } from '../Libraries/Libraries';
 import { exec } from 'child_process';
+import { Log } from '../Modules/Core/Logs/Logs';
 
 let clipboardInterval: NodeJS.Timeout | null = null;
 
@@ -72,5 +73,25 @@ export default function Events(mWindow: SysWindow) {
         const info = await process.getProcessMemoryInfo() as { private?: number; shared?: number; residentSet?: number };
         const totalMb = (info.residentSet ?? ((info.private ?? 0) + (info.shared ?? 0))) / 1024;
         return totalMb.toFixed(2);
+    });
+
+    ipcMain.handle("createConfFile", (event, content, name, extension) => {
+        const tempPath = Path.join(System.homedir(), "Ariranha", "Temp");
+        if (!Filesystem.existsSync(tempPath)) {
+            Filesystem.mkdirSync(tempPath, { recursive: true });
+        }
+
+        const filePath = Path.join(tempPath, `temp.${name}.${extension}`);
+        Filesystem.writeFileSync(filePath, content, 'utf8');
+
+        return filePath;
+    });
+
+    ipcMain.on("removeTempFile", (event, path) => {
+        if (!Filesystem.existsSync(path)) {
+            Log.New().Message("removeTempFile", "Não foi possível encontrar os arquivos temporários para efetuar a exclusão. Apenas ignorando chamada.");
+        } else {
+            Filesystem.unlinkSync(path);
+        }
     });
 }
