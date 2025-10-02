@@ -1,3 +1,5 @@
+import { __api__functions__, __html__functions__ } from "../src/ts/Modules/Plugins/Functions";
+
 export { };
 
 declare global {
@@ -48,6 +50,6 @@ declare global {
     }
 
     interface PluginModule {
-        init?: (api: __api__, html: __html__) => void;
+        init?: (api = __api__functions__, html = __html__functions__) => void;
     }
 }

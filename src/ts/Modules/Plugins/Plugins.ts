@@ -5,15 +5,14 @@ import SysWindow from "../Core/Window/Window";
 import { __api__functions__, __html__functions__ } from "./Functions";
 import fetch from "node-fetch";
 import AdmZip = require("adm-zip");
-import { basename } from "path";
 
 
 export class Extension {
     private static DIR_ExtensionDirectory: string = Path.join(System.homedir(), "Ariranha", "Plugins");
     private static WIN_ExtensionWindow: SysWindow;
     private static ExtensionsLoaded: string[] = [];
-    private static api: __api__ = __api__functions__;
-    private static html: __html__ = __html__functions__;
+    private static api = __api__functions__;
+    private static html = __html__functions__;
 
     public static getExtensionWindow(): SysWindow {
         return Extension.WIN_ExtensionWindow;

@@ -1,43 +1,135 @@
-import * as cheerio from "cheerio";
-import { Filesystem, Path, Project, System } from "../../Libraries/Libraries";
-import { SQL } from "./Query";
+import { Filesystem, Path, Project, System, HtmlParser } from "../../Libraries/Libraries";
 import SysWindow from "../Core/Window/Window";
 import { Extension } from "./Plugins";
+import { WriteFileOptions } from "fs";
+import { Log } from "../Core/Logs/Logs";
+import mysql from "mysql2/promise";
+
+export type PoolData = {
+    host: string,
+    user: string,
+    password: string,
+    database: string,
+    waitForConnections: boolean,
+    connectionLimit: number,
+    queueLimit: number;
+}
+
+export type ariranhaProcessManager = NodeJS.Signals;
 
 export class __api__functions__ {
-    static get = {
-        version() {
-            return Project.version;
+    public app = {
+        version: (): string => Project.version,
+    };
+
+    public node = {
+        on: (signal: NodeJS.Signals | "exit" | "beforeExit" | "uncaughtException", callback: (...args: any[]) => any) => {
+            process.on(signal, (...args) => {
+                callback(...args);
+            });
         },
-    };
-
-    static files = {
-        readFile(Filepath: string) {
-            return Filesystem.readFileSync((Path.join(System.homedir(), "Ariranha", "Plugins", Filepath)), "utf-8");
+        runtime: {
+            platform: () => process.platform,
+            arch: () => process.arch,
+            uptime: () => process.uptime(),
+            osVersion: () => process.getSystemVersion,
         }
     };
 
-    static sql = {
-        async query(Keys: { host: string, user: string, password: string, database: string }, Query: string) {
-            const base = new SQL(Keys);
+    static file(Filepath: string) {
+        const filePath = Path.join(System.homedir(), "Ariranha", "Plugins", Filepath);
 
-            try {
-                const response: any = await base.query(Query);
-
-                return response;
-            } catch (err) {
-                console.error("Erro na consulta:", err);
-            } finally {
-                await base.close();
+        return {
+            readFileSync(encoding: BufferEncoding = "utf8"): string | undefined {
+                try {
+                    const fileContent: string = Filesystem.readFileSync(filePath, encoding);
+                    return fileContent;
+                } catch (err) {
+                    Log.New().Error("__api__functions__.files.readFileSync", `Não foi possível ler o arquivo: ${err}`);
+                    return undefined;
+                };
+            },
+            async readFile(encoding: BufferEncoding = "utf8"): Promise<string> {
+                return new Promise<string>((resolve, reject) => {
+                    Filesystem.readFile(filePath, encoding, (err, data) => {
+                        if (err) return reject(err);
+                        resolve(data);
+                    });
+                });
+            },
+            createFileSync(content: string, options: WriteFileOptions): undefined {
+                try {
+                    Filesystem.writeFileSync(filePath, String(content), options);
+                } catch (err) {
+                    Log.New().Error("__api__functions__.files.createFile", `Não foi possível criar o arquivo: ${err}`);
+                };
+                return undefined;
+            },
+            async createFile(content: string, options: WriteFileOptions): Promise<string> {
+                return new Promise<string>((resolve, reject) => {
+                    Filesystem.writeFile(filePath, content, options, (err) => {
+                        if (err) return reject(err);
+                        resolve(filePath);
+                    });
+                });
+            },
+            translateSync(fromEncoding: BufferEncoding, toEncoding: BufferEncoding): string | undefined {
+                try {
+                    const fileData = Filesystem.readFileSync(filePath, { encoding: fromEncoding });
+                    return Buffer.from(fileData, fromEncoding).toString(toEncoding);
+                } catch (err) {
+                    Log.New().Error("__api__functions__.files.createFile", `Não foi possível traduzir o arquivo: ${err}`);
+                    return undefined;
+                }
+            },
+            async translate(fromEncoding: BufferEncoding, toEncoding: BufferEncoding) {
+                return new Promise<string>((resolve, reject) => {
+                    Filesystem.readFile(filePath, { encoding: fromEncoding }, (err, fileData) => {
+                        if (err) return reject(err);
+                        resolve(Buffer.from(fileData, fromEncoding).toString(toEncoding));
+                    });
+                });
             }
-        }
+        };
+    };
+
+    static sql() {
+        let poolConnection: mysql.Pool | undefined = undefined;
+
+        return {
+            pool() {
+                return {
+                    init(Pool: PoolData): void {
+                        if (!poolConnection) {
+                            poolConnection = mysql.createPool(Pool);
+                        }
+                    },
+                    async close(): Promise<void> {
+                        if (poolConnection) {
+                            await poolConnection.end();
+                            poolConnection = undefined;
+                        }
+                    },
+                };
+            },
+            async query(sql: string, params?: any[]): Promise<any> {
+                try {
+                    if (!poolConnection) throw new Error(`A conexão com a base de dados não foi iniciada. Inicie a conexão e tente novamente.`);
+                    const [rows]: any = await poolConnection.query(sql, params);
+                    return rows;
+                } catch (err) {
+                    Log.New().Error(`SQL.query`, "Não foi possível efetuar a consulta via base de dados: " + err as string);
+                    return;
+                }
+            }
+        };
     };
 }
 
 export class __html__functions__ {
     private static getHtml(): string {
         const html = Filesystem.readFileSync(Path.join(__dirname, "../../../../public/Main.html"), "utf-8");
-        const $ = cheerio.load(html);
+        const $ = HtmlParser.load(html);
 
         const mainTag = $("main");
 
@@ -62,10 +154,34 @@ export class __html__functions__ {
         },
     };
 
+    private static removeImports(js?: string) {
+        if (!js) return js;
+
+        const lines = js.split("\n");
+        const result: string[] = [];
+        let skipping = false;
+
+        for (const line of lines) {
+            if (!skipping && line.includes("import")) {
+                skipping = true;
+            }
+
+            if (skipping) {
+                if (line.includes(";")) skipping = false;
+                continue; // pula linha do import
+            }
+
+            result.push(line); // mantém linhas normais
+        }
+
+        return result.join("\n");
+    }
+
     static insert = {
         inElementId(TargetId: string, html?: string, css?: string, js?: string) {
+            const jsCleanCode = __html__functions__.removeImports(js);
             __html__functions__.Window = Extension.getExtensionWindow();
-            __html__functions__.Window.webContents.send("Plugins: insertContent (load)", TargetId, html, css, js);
+            __html__functions__.Window.webContents.send("Plugins: insertContent (load)", TargetId, html, css, jsCleanCode);
         }
     };
 

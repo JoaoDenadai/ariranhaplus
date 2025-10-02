@@ -10,10 +10,25 @@ class PopupMenu {
 
     private setDefaultMenu(event: PointerEvent) {
         event.preventDefault();
-
-        this.menuElement.style.top = `${event.pageY}px`;
-        this.menuElement.style.left = `${event.pageX}px`;
+        this.menuElement.style.visibility = "hidden";
         this.menuElement.style.display = "block";
+
+        const getBounding = this.menuElement.getBoundingClientRect();
+
+        let left = event.clientX;
+        let top = event.clientY;
+
+        if (event.clientX + getBounding.width > window.innerWidth) {
+            left = left - ((event.clientX + getBounding.width - window.innerWidth) * 3);
+        }
+        if (event.clientY + getBounding.height > window.innerHeight) {
+            top = top - (event.clientY + getBounding.height - window.innerHeight);
+        }
+
+        this.menuElement.style.top = `${top}px`;
+        this.menuElement.style.left = `${left}px`;
+        this.menuElement.style.visibility = "visible";
+
     }
 
     public show() {
@@ -94,6 +109,7 @@ class PopupMenu {
         });
 
         submenuElementsContainer.addEventListener("mouseover", () => {
+
             submenuElementsContainer.style.display = "block";
         });
 

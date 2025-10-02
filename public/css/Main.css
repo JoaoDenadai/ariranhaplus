@@ -18,6 +18,11 @@
     outline: none;
 }
 
+html{
+    border-left: 2px solid var(--darker-white-color);
+    border-right: 2px solid var(--darker-white-color);
+}
+
 body{
     background-color: var(--white-color);
 
@@ -26,6 +31,8 @@ body{
 
     display: flex;
     flex-direction: column;
+
+
 
     overflow-x: hidden;
     overflow-y: hidden;
@@ -95,7 +102,7 @@ body{
 
 .SubmenuElementsContainer{
     top: 0;
-    left: 100%;
+    left: -100%;
 }
 
 .ContextMenu button{
@@ -137,7 +144,7 @@ body{
     border: none;
 
     display: flex;
-    justify-content: center;
+    justify-content: left;
     align-items: center;
 
     overflow: hidden;

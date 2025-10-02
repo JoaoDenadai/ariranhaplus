@@ -2,11 +2,9 @@ import { Filesystem, Instance, Path, System } from "../Libraries/Libraries";
 import SysWindow from "../Modules/Core/Window/Window";
 import { Log, Web } from "../Modules/Core/Logs/Logs";
 import Popup from "../Modules/Core/Popup/Popup";
-import Errno from "../Modules/Core/Errno/Errno";
 import Events from "./Main.Process";
 import { Extension } from "../Modules/Plugins/Plugins";
 import { Updater } from "../Modules/Updater/Updater";
-import { File } from "../Modules/Core/Files/Files";
 
 let mWindow: SysWindow | undefined;
 
@@ -48,14 +46,14 @@ async function createMainWindow(): Promise<void> {
       }
     });
   } catch (error) {
-    await Popup.New().Error("Erro ao abrir a janela", "Não foi possível abrir a janela:\n" + Errno.onError(error), undefined, true);
+    await Popup.New().Error("Erro ao abrir a janela", "Não foi possível abrir a janela:\n" + error, undefined, true);
     return;
   }
 
   try {
     mWindow.loadFile(Path.join(__dirname, "../../../public/Main.html"));
   } catch (error: unknown) {
-    await Popup.New().Error("Erro ao abrir a janela", Errno.onError(error), undefined, true);
+    await Popup.New().Error("Erro ao abrir a janela", error as string, undefined, true);
   }
 
   try {
@@ -64,7 +62,7 @@ async function createMainWindow(): Promise<void> {
     };
     Events(mWindow);
   } catch (error: unknown) {
-    await Popup.New().Error("Erro ao registrar eventos da janela", Errno.onError(error), undefined, true);
+    await Popup.New().Error("Erro ao registrar eventos da janela", error as string, undefined, true);
   }
 
   await new Promise<void>((resolve, reject) => {
@@ -109,31 +107,6 @@ function processInitArguments() {
 
   Popup.Set().Parent(mWindow as SysWindow);
   processInitArguments();
-
-  const base: File_Settings_ariranha = {
-    token: "none",
-    username: "beta",
-    settings: {
-      general: {
-        locale: "pt-BR",
-      },
-      plugins: {
-        loaded: [""],
-      },
-      developer: {
-        enabled: false,
-      }
-    }
-  };
-
-  const Config = new File<File_Settings_ariranha>(Path.join(System.homedir(), "Ariranha", "Settings", "Settings.ariranha"), "base64", base);
-  if (!Config.verifyIfFileExists()) {
-    Config.createFile(base);
-    if (mWindow) mWindow.webContents.send("Settings: data", base);
-  } else {
-    const fileData = Config.readFile();
-    if (mWindow) mWindow.webContents.send("Settings: data", fileData);
-  }
 
   await Extension.init(mWindow as SysWindow);
   mWindow?.webContents.send("AllPluginsFinishedLoad");

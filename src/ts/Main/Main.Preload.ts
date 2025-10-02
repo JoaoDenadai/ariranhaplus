@@ -1,5 +1,4 @@
 import { contextBridge, ipcRenderer } from "electron";
-import Popup from "../Modules/Core/Popup/Popup";
 
 contextBridge.exposeInMainWorld("ariranha_", {
     Action: (message: string) => {
