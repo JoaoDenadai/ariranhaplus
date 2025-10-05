@@ -1,0 +1,56 @@
+#Content{
+    margin-top: 35px;
+    width: 100vw;
+    height: calc(100vh - 35px);
+
+    background-color: #f1f1f1;
+
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+#Content *{
+    padding-bottom: 15px;
+}
+
+#Content img{
+    width: 50px;
+    height: 50px;
+}
+
+#Content label{
+    font-size: 20px;
+}
+
+#Content textarea{
+    width: 90vw;
+    height: 10vh;
+    resize: none;
+    flex-grow: 1;
+    margin-bottom: 15px;
+
+    font-size: 11px;
+
+    white-space: pre;
+    overflow-x: auto;
+}
+
+#Type-indicator-buttons{
+    width: 90.7vw;
+    height: 25px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+#Type-indicator-buttons button{
+    display: flex;
+    align-content: center;
+    justify-content: center;
+}
+
+#Content button{
+    width: 75px;
+    height: 100%;
+    margin-left: 5px;
+}

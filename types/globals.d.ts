@@ -3,6 +3,16 @@ export { };
 
 declare global {
     type Application = typeof App;
+    type PoolLink = { Data: PoolData, Pool: Pool };
+    type PoolData = {
+        host: string;
+        user: string;
+        password: string;
+        database: string;
+        waitForConnections?: boolean;
+        connectionLimit?: number;
+        queueLimit?: number;
+    };
 
     interface MessageBoxData {
         Type: string,
@@ -69,6 +79,10 @@ declare global {
             insertContentInElementId: (Callback: (targetId: string, html: string, css: string, js: string) => void) => void
             Terminal: (args: string) => Promise<any>
             AllPluginsFinishedLoad: (callback: () => void) => void
+        }
+        ambientBridge: {
+            sendToServer: (channel: string, ...args: any[]) => Promise<any>
+            addResponse: (channel: string, callback: (...args: any[]) => any) => void
         }
     }
 }

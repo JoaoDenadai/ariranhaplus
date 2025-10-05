@@ -6,7 +6,7 @@
 /*
  *  Importa a parte de comunicação e bibliotecas base.
  */
-import { Instance, Path } from "../../../Libraries/Libraries";
+import { Instance, Path, path_Dependencies } from "../../../Libraries/Libraries";
 import { ipcMain } from 'electron';
 
 
@@ -14,17 +14,17 @@ import { ipcMain } from 'electron';
  *  Importa dependências de outros classes.
  */
 import { Log } from "../Logs/Logs";
-import SysWindow from "../Window/Window";
+import _Window_ from "../Window/Window";
 
 export default class Popup {
-    private static PopupWindow: SysWindow | undefined = undefined;
-    private static Parent: SysWindow | undefined = undefined;
+    private static PopupWindow: _Window_ | undefined = undefined;
+    private static Parent: _Window_ | undefined = undefined;
 
     public static async MessageBoxFromFrontend(Title: string, Type: string, Message: string, Description: string, Close?: boolean): Promise<void | boolean> {
         return await this.MessageBox(Title, Type, Message, Description, this.Parent ?? undefined, Close ?? false);
     }
 
-    private static async MessageBox(Title: string, Type: string, Message: string, Description: string, Target?: SysWindow, Close?: boolean): Promise<void | boolean> {
+    private static async MessageBox(Title: string, Type: string, Message: string, Description: string, Target?: _Window_, Close?: boolean): Promise<void | boolean> {
         /*
          *  Essa função assíncrona abre uma nova tela de Popup e processa a resposta do ipcRenderer.
          *  A função irá parar a execução do programa até que a Promise seja retornada (E isso apenas ocorre quando a janela for fechada, de alguma forma).
@@ -55,7 +55,7 @@ export default class Popup {
              *  Observe que a janela depende de "Preload", então, para comunicar-se com o frontend, precisa declarar as
              *  funções pelo arquivo de "Preload.ts" no mesmo diretório que essa classe.
              */
-            Popup.PopupWindow = new SysWindow({
+            Popup.PopupWindow = new _Window_({
                 width: 500,
                 height: 300,
                 minWidth: 400,
@@ -95,7 +95,7 @@ export default class Popup {
             /*  Carrega o conteúdo da janela.
              *  Caso o arquivo "Index.html" seja movido, precisa editar o caminho abaixo.
              */
-            await Popup.PopupWindow.loadFile(Path.join(__dirname, "./public/Index.html"));
+            await Popup.PopupWindow.loadFile(Path.join(path_Dependencies, "Popup", "Index.html"));
         } catch (error) {
             Log.New().Error('MessageBox',
                 'Não foi possível carregar o conteúdo da janela de mensagem: ' + String(error)
@@ -197,7 +197,7 @@ export default class Popup {
     }
 
     public static Set(): {
-        Parent: (Parent: SysWindow) => void;
+        Parent: (Parent: _Window_) => void;
     } {
         /*
          *  A função abaixo adiciona uma nova janela como "Parent".
@@ -208,7 +208,7 @@ export default class Popup {
          *  Enquanto o Popup estiver aberto, a janela "Parent" ficará pausada aguardando o Popup ser fechado.
          */
         return {
-            Parent: (Parent: SysWindow) => {
+            Parent: (Parent: _Window_) => {
                 Popup.Parent = Parent;
             },
         };
@@ -231,10 +231,10 @@ export default class Popup {
     };
 
     public static New(): {
-        Message: (Title: string, Description: string, Window?: SysWindow, Close?: boolean) => Promise<void>;
-        Warning: (Title: string, Description: string, Window?: SysWindow, Close?: boolean) => Promise<void>;
-        Error: (Title: string, Description: string, Window?: SysWindow, Close?: boolean) => Promise<void>;
-        Confirm: (Title: string, Description: string, Window?: SysWindow, Close?: boolean) => Promise<boolean>
+        Message: (Title: string, Description: string, Window?: _Window_, Close?: boolean) => Promise<void>;
+        Warning: (Title: string, Description: string, Window?: _Window_, Close?: boolean) => Promise<void>;
+        Error: (Title: string, Description: string, Window?: _Window_, Close?: boolean) => Promise<void>;
+        Confirm: (Title: string, Description: string, Window?: _Window_, Close?: boolean) => Promise<boolean>
     } {
         /*
          *  Função principal da classe.
@@ -245,16 +245,16 @@ export default class Popup {
          *
          */
         return {
-            Message: async (Title: string, Description: string, Window?: SysWindow, Close?: boolean) => {
+            Message: async (Title: string, Description: string, Window?: _Window_, Close?: boolean) => {
                 await Popup.MessageBox('Mensagem do sistema', 'Message', Title, Description, Window ?? Popup.Parent, Close ?? false);
             },
-            Warning: async (Title: string, Description: string, Window?: SysWindow, Close?: boolean) => {
+            Warning: async (Title: string, Description: string, Window?: _Window_, Close?: boolean) => {
                 await Popup.MessageBox('Aviso', 'Warning', Title, Description, Window ?? Popup.Parent, Close ?? false);
             },
-            Error: async (Title: string, Description: string, Window?: SysWindow, Close?: boolean) => {
+            Error: async (Title: string, Description: string, Window?: _Window_, Close?: boolean) => {
                 await Popup.MessageBox('Violações encontradas', 'Error', Title, Description, Window ?? Popup.Parent, Close ?? false);
             },
-            Confirm: async (Title: string, Description: string, Window?: SysWindow, Close?: boolean) => {
+            Confirm: async (Title: string, Description: string, Window?: _Window_, Close?: boolean) => {
                 return await Popup.MessageBox('Confirmação', 'Confirm', Title, Description, Window ?? Popup.Parent, Close ?? false) as boolean;
             },
         };

@@ -1,12 +1,12 @@
 import { Filesystem, Instance, Path, System } from "../Libraries/Libraries";
-import SysWindow from "../Modules/Core/Window/Window";
+import _Window_ from "../Modules/Core/Window/Window";
 import { Log, Web } from "../Modules/Core/Logs/Logs";
 import Popup from "../Modules/Core/Popup/Popup";
 import Events from "./Main.Process";
 import { Extension } from "../Modules/Plugins/Plugins";
 import { Updater } from "../Modules/Updater/Updater";
 
-let mWindow: SysWindow | undefined;
+let mWindow: _Window_ | undefined;
 
 function singleInstanceLock(): boolean {
   const mLock = Instance.requestSingleInstanceLock();
@@ -30,7 +30,7 @@ async function createMainWindow(): Promise<void> {
   if (!Instance.isReady()) await Instance.whenReady();
 
   try {
-    mWindow = new SysWindow({
+    mWindow = new _Window_({
       width: 720,
       height: 450,
       minHeight: 280,
@@ -75,6 +75,7 @@ async function createMainWindow(): Promise<void> {
       if (mWindow) {
         mWindow.show();
         await mWindow.awaitFocus();
+        await Extension.init(mWindow);
       }
       resolve();
     });
@@ -105,10 +106,9 @@ function processInitArguments() {
   await Instance.whenReady();
   await createMainWindow();
 
-  Popup.Set().Parent(mWindow as SysWindow);
+  Popup.Set().Parent(mWindow as _Window_);
   processInitArguments();
 
-  await Extension.init(mWindow as SysWindow);
   mWindow?.webContents.send("AllPluginsFinishedLoad");
-  Updater.init(mWindow as SysWindow);
+  Updater.init(mWindow as _Window_);
 })();

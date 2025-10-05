@@ -1,20 +1,21 @@
 
-import { Filesystem, Path, System } from "../../Libraries/Libraries";
+import { Filesystem, Path, System, Zip } from "../../Libraries/Libraries";
 import { Log, Web } from "../Core/Logs/Logs";
-import SysWindow from "../Core/Window/Window";
-import { __api__functions__, __html__functions__ } from "./Functions";
+import _Window_ from "../Core/Window/Window";
+import { __ambientBridge__functions__, __api__functions__, __html__functions__, __sql__functions__ } from "./Functions";
 import fetch from "node-fetch";
-import AdmZip = require("adm-zip");
 
 
 export class Extension {
     private static DIR_ExtensionDirectory: string = Path.join(System.homedir(), "Ariranha", "Plugins");
-    private static WIN_ExtensionWindow: SysWindow;
+    private static WIN_ExtensionWindow: _Window_;
     private static ExtensionsLoaded: string[] = [];
     private static api = __api__functions__;
     private static html = __html__functions__;
+    private static sql = __sql__functions__;
+    private static ambientBridge = __ambientBridge__functions__;
 
-    public static getExtensionWindow(): SysWindow {
+    public static getExtensionWindow(): _Window_ {
         return Extension.WIN_ExtensionWindow;
     }
 
@@ -48,7 +49,7 @@ export class Extension {
             Filesystem.rmSync(pluginFolder, { recursive: true, force: true });
         }
 
-        const zip = new AdmZip(filePath);
+        const zip = new Zip(filePath);
         zip.extractAllToAsync(this.DIR_ExtensionDirectory);
 
         console.log("Arquivo criado: ", filePath);
@@ -79,7 +80,7 @@ export class Extension {
             console.log("Nenhuma atualização encontrada");
         }
     }
-    public static async init(mWindow: SysWindow) {
+    public static async init(mWindow: _Window_) {
         this.WIN_ExtensionWindow = mWindow;
 
         if (!Extension.WIN_ExtensionWindow) {
@@ -123,7 +124,7 @@ export class Extension {
 
                     if (Plugin && typeof Plugin.init === "function") {
                         try {
-                            await Plugin.init(Extension.api, Extension.html);
+                            await Plugin.init(Extension.api, Extension.html, Extension.sql, Extension.ambientBridge);
                             new Web(this.WIN_ExtensionWindow).New().Message("Extension.init", `Plugin carregado: ${Extension_ManifestFile.name}`);
                         } catch (error: unknown) {
                             throw new Error(String(error));

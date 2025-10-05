@@ -62,3 +62,17 @@ contextBridge.exposeInMainWorld("Plugins_", {
         ipcRenderer.on('AllPluginsFinishedLoad', (event) => callback());
     }
 });
+
+contextBridge.exposeInMainWorld("ambientBridge", {
+    //Client
+    sendToServer: async (channel: string, ...args: any[]) => {
+        return await ipcRenderer.invoke(channel, ...args);
+    },
+
+    addResponse: (channel: string, callback: (...args: any[]) => any) => {
+        ipcRenderer.on(channel, async (event, ...args) => {
+            const result = await callback(event, ...args);
+            ipcRenderer.send(channel, result);
+        });
+    },
+});

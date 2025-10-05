@@ -1,0 +1,92 @@
+
+/*
+ *  Globais
+ */
+*{
+    user-select: none;
+}
+
+*:focus{
+    outline: none;
+}
+
+body{
+    margin: 0px;
+    padding: 0px;
+
+    display: flex;
+    flex-direction: column;
+}
+
+/*
+ *  Barra de título
+ */
+#Window-titlebar{
+    width: 100vw;
+    height: 35px;
+    background-color: #f1f1f1;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    
+    position: fixed;
+    -webkit-app-region: drag;
+}
+
+#Window-titlebar label{
+    margin-left: 5px;
+}
+
+#Window-titlebar-title{
+    width: 50vw;
+    height: 100%;
+    background-color: transparent;
+
+    display: flex;
+    align-items: center;
+}
+
+#Window-titlebar-title img{
+    width: 25px;
+    margin-left: 5px;
+}
+
+/*
+ *  Botões da barra de título
+ */
+#Window-titlebar-buttonsdiv{
+    display: flex;
+    height: 100%;
+}
+
+#Window-titlebar-buttonsdiv button{
+    width: 35px;
+    height: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+
+    border: none;
+    -webkit-app-region: no-drag;
+}
+
+#Window-titlebar-buttonsdiv button img{
+    width: 25px;
+    opacity: 0.5;
+
+    transform: scale(0.5);
+}
+
+/*
+ *  Eventos
+ */
+#Window-titlebar-buttonsdiv button:hover{
+    background-color: #e1e1e1;
+}
+
+#Window-titlebar-buttonsdiv button:hover img{
+    opacity: 1;
+}

@@ -1,14 +1,14 @@
 import { ipcMain, clipboard } from 'electron';
 import App from "../../../package.json";
 import Popup from '../Modules/Core/Popup/Popup';
-import SysWindow from '../Modules/Core/Window/Window';
+import _Window_ from '../Modules/Core/Window/Window';
 import { Filesystem, Instance, Path, System } from '../Libraries/Libraries';
 import { exec } from 'child_process';
 import { Log } from '../Modules/Core/Logs/Logs';
 
 let clipboardInterval: NodeJS.Timeout | null = null;
 
-export default function Events(mWindow: SysWindow) {
+export default function Events(mWindow: _Window_) {
     mWindow.on('close', (event) => {
         if (clipboardInterval) {
             clearInterval(clipboardInterval);

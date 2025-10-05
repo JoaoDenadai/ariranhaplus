@@ -4,7 +4,7 @@
  */
 import { Prompt } from "../../../Libraries/Libraries";
 import Time from "../Time/Time";
-import SysWindow from "../Window/Window";
+import _Window_ from "../Window/Window";
 
 
 export class Log {
@@ -50,9 +50,9 @@ export class Log {
 }
 
 export class Web {
-  private Parent: SysWindow;
+  private Parent: _Window_;
 
-  constructor(Window: SysWindow) {
+  constructor(Window: _Window_) {
     this.Parent = Window;
   }
 

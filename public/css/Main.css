@@ -102,7 +102,7 @@ body{
 
 .SubmenuElementsContainer{
     top: 0;
-    left: -100%;
+    left: 100%;
 }
 
 .ContextMenu button{

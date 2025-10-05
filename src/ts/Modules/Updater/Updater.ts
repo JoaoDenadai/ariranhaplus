@@ -1,10 +1,10 @@
 import { autoUpdater } from "electron-updater";
-import SysWindow from "../Core/Window/Window";
+import _Window_ from "../Core/Window/Window";
 import { Log } from "../Core/Logs/Logs";
 import Popup from "../Core/Popup/Popup";
 
 export class Updater {
-    private static WIN_mWindow: SysWindow;
+    private static WIN_mWindow: _Window_;
     private static LET_checkUpdatesDelayTime = 5;
 
     private static listeners() {
@@ -41,7 +41,7 @@ export class Updater {
         }, Updater.LET_checkUpdatesDelayTime * 60 * 1000);
     }
 
-    public static init(mWindow: SysWindow) {
+    public static init(mWindow: _Window_) {
         autoUpdater.autoDownload = false;
         Updater.WIN_mWindow = mWindow;
 

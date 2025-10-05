@@ -4,5 +4,5 @@
       "rootDir": "./ts",
       "outDir": "./js"
     },
-    "include": ["ts/**/*", "../types/**/*"]
+    "include": ["./ts/**/*", "../types/**/*"],
   }

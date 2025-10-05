@@ -48,6 +48,7 @@
     "@types/acorn": "^4.0.6",
     "@types/adm-zip": "^0.5.7",
     "@types/cheerio": "^0.22.35",
+    "@types/dotenv": "^6.1.1",
     "@types/electron": "^1.4.38",
     "@types/node": "^24.0.10",
     "@types/node-fetch": "^2.6.13",
@@ -62,6 +63,7 @@
     "acorn": "^8.15.0",
     "adm-zip": "^0.5.16",
     "cheerio": "^1.1.2",
+    "dotenv": "^17.2.3",
     "electron-updater": "^6.6.2",
     "mysql2": "^3.14.5",
     "node-fetch": "^3.3.2"
