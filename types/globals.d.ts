@@ -71,6 +71,7 @@ declare global {
             Log: (Callback: (Message: string, Type: LogTypes) => void) => void
             createTempFile: (Content: string, Name: string, Extension: string) => Promise<any>
             removeTempFile: (path: any) => void
+            PopupMessage: (Title: string, Type: PopupTypes, Message: string, Description: string, Close?: boolean) => Promise<void>
         }
         Plugins_: {
             initCss: (Callback: (CssCode: string) => void) => void

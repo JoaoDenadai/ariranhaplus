@@ -13,22 +13,26 @@ class PopupMenu {
         this.menuElement.style.visibility = "hidden";
         this.menuElement.style.display = "block";
 
-        const getBounding = this.menuElement.getBoundingClientRect();
+        this.menuElement.offsetWidth;
+
+        this.menuElement.style.top = `${event.clientY}px`;
+        this.menuElement.style.left = `${event.clientX}px`;
 
         let left = event.clientX;
         let top = event.clientY;
 
-        if (event.clientX + getBounding.width > window.innerWidth) {
-            left = left - ((event.clientX + getBounding.width - window.innerWidth) * 3);
+        const bounding = this.menuElement.getBoundingClientRect();
+        if (Number(bounding.left + bounding.width) > Number(window.innerWidth)) {
+            left = window.innerWidth - bounding.width;
         }
-        if (event.clientY + getBounding.height > window.innerHeight) {
-            top = top - (event.clientY + getBounding.height - window.innerHeight);
+        if (Number(bounding.top + bounding.height) > Number(window.innerHeight)) {
+            top = window.innerHeight - bounding.height;
         }
 
         this.menuElement.style.top = `${top}px`;
         this.menuElement.style.left = `${left}px`;
-        this.menuElement.style.visibility = "visible";
 
+        this.menuElement.style.visibility = "visible";
     }
 
     public show() {
@@ -104,12 +108,24 @@ class PopupMenu {
                 menu.elementsContainer.style.display = "none";
             });
 
+            submenuElementsContainer.style.visibility = "hidden";
             submenuElementsContainer.style.display = "block";
+
+            submenuElementsContainer.offsetWidth;
+
             submenuElementsContainer.style.top = `${submenuButton.offsetTop - 1}px`;
+            submenuElementsContainer.style.left = "100%";
+
+            const boundings = submenuElementsContainer.getBoundingClientRect();
+
+            if (Number(window.innerWidth) < Number(boundings.left + boundings.width)) {
+                submenuElementsContainer.style.left = `${0 - boundings.width}px`;
+            }
+
+            submenuElementsContainer.style.visibility = "visible";
         });
 
         submenuElementsContainer.addEventListener("mouseover", () => {
-
             submenuElementsContainer.style.display = "block";
         });
 
@@ -122,7 +138,6 @@ class PopupMenu {
 
     addButtosnInSubmenu(SubmenuName: string, Buttons: ContextMenuButtonDeclarationArray) {
         const getSubmenu = this.submenus.find(submenu => submenu.title === SubmenuName);
-        console.log(getSubmenu);
         if (getSubmenu) {
             Buttons.forEach((btn) => {
                 const elementButton = document.createElement("button");

@@ -36,7 +36,10 @@ contextBridge.exposeInMainWorld("WebContent", {
     },
     removeTempFile: (path: any) => {
         ipcRenderer.send("removeTempFile", path);
-    }
+    },
+    PopupMessage: async (Title: string, Type: PopupTypes, Message: string, Description: string, Close?: boolean): Promise<void> => {
+        return ipcRenderer.invoke("Main:Popup", Title, String(Type), Message, Description, Close);
+    },
 });
 
 contextBridge.exposeInMainWorld("Plugins_", {

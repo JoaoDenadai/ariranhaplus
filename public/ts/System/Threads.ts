@@ -24,7 +24,9 @@ class Thread {
                     this.running++;
                     await fn();
                 } catch (err) {
-                    console.error(`Erro ao executar thread ${id}: `, err);
+                    window.WebContent.PopupMessage("Erro em Thread", "Error", "Não foi possível executar a Thread.",
+                        `Não foi possível executar a seguinte thread: ${fn.name}\nRetorno: ${err}`
+                    );
                 } finally {
                     this.running--;
                 }
